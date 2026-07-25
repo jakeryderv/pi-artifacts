@@ -62,9 +62,10 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
   tag; `.github/workflows/release.yml` re-runs the full preflight and publishes.
   Do not `npm publish` from a laptop — the workflow is the only trusted publisher.
 - Auth is npm **trusted publishing** (OIDC, `id-token: write`), so there is no
-  `NPM_TOKEN` secret and every release carries a provenance attestation. The
-  one-time npm-side grant is
-  `npm trust github @jakeryderv/pi-artifacts --repo jakeryderv/pi-artifacts --file release.yml --allow-publish`.
+  `NPM_TOKEN` secret and every release carries a provenance attestation. It
+  depends on a one-time grant configured on npmjs.com (package → Settings →
+  Trusted publisher → GitHub Actions, repo `jakeryderv/pi-artifacts`, workflow
+  `release.yml`); without it the publish step fails with an auth error.
 - The tag must match `package.json` `version` — the workflow fails the release if
   they diverge.
 - Publishes with public access under `@jakeryderv/pi-artifacts`. Cut real semver

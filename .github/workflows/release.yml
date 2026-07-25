@@ -1,11 +1,11 @@
 name: release
 
 # Publishes @jakeryderv/pi-artifacts when a v* tag is pushed. Authentication is
-# npm trusted publishing (OIDC) — no NPM_TOKEN secret. One-time setup on the npm
-# side, run locally by a package owner:
-#
-#   npm trust github @jakeryderv/pi-artifacts \
-#     --repo jakeryderv/pi-artifacts --file release.yml --allow-publish
+# npm trusted publishing (OIDC) — no NPM_TOKEN secret. This requires a one-time
+# grant on the npm side, naming this repository and this workflow file, from
+# npmjs.com → the package → Settings → Trusted publisher → GitHub Actions
+# (repository `jakeryderv/pi-artifacts`, workflow `release.yml`). npm 12 can also
+# do it from the CLI via `npm trust github`, but that needs Node >= 24.15.
 #
 # Publishing over OIDC also attaches a provenance attestation automatically.
 
@@ -38,7 +38,9 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       # Trusted publishing needs npm >= 11.5.1, newer than some Node 24 images.
-      - run: npm install -g npm@latest
+      # Held at 11.x deliberately: npm 12 requires Node >= 24.15, which the
+      # `node-version: 24` pin above does not guarantee.
+      - run: npm install -g npm@^11.5.1
 
       - run: npm ci
 

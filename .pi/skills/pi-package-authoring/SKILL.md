@@ -86,7 +86,8 @@ Releases are tag-triggered, never published from a laptop:
 2. Commit, push `main`, and confirm the `ci` workflow is green.
 3. Push a matching `v<version>` tag. `.github/workflows/release.yml` re-runs the
    preflight and publishes over npm trusted publishing (OIDC), which also
-   attaches a provenance attestation.
+   attaches a provenance attestation. This depends on a one-time trusted
+   publisher grant configured on npmjs.com for this repo + `release.yml`.
 
 The workflow fails if the tag and `package.json` version disagree. Tags from the
 monorepo era use the older `pi-artifacts-v*` form; new tags are `v*`.
