@@ -81,7 +81,7 @@ in the same pass: package metadata (`repository`/`bugs`/`homepage`, expanded
 `keywords`, `author`), README Install/Quickstart, bundled `LICENSE` (added to
 `files`), root README status updated. Git tag `pi-artifacts-v0.1.0` pushed.
 Future publishes: scope-level granular npm token on `@jakeryderv` (read/write,
-bypass 2FA) covers every package in this monorepo.
+bypass 2FA) covers every `@jakeryderv/*` package, in any repo.
 
 ### Phase C — MVP-2: html stack
 
@@ -303,12 +303,12 @@ npm run typecheck
 npm test
 npm run format:check
 npm run lint:md
-npm run pack:artifacts -- --json
+npm run pack:check -- --json
 ```
 
 Manual smoke test:
 
 ```bash
 cd "$(mktemp -d)"
-pi -e /home/jake/dev/projects/pi-packages/packages/pi-artifacts
+pi -e /home/jake/dev/projects/pi-artifacts
 ```

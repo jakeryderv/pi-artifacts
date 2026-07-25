@@ -8,9 +8,8 @@ repo-level [`packaging notes`](../../../docs/notes/packaging.md).
 
 ## Settled foundations
 
-- Workspace package folder: `packages/pi-artifacts`.
+- Single-package repo: the repo root is the package.
 - Published npm package: `@jakeryderv/pi-artifacts`.
-- Root repo remains private and unpublished.
 - Package includes a Pi extension, a Pi skill/authoring guide, and a package
   README.
 - Preview uses a localhost-only static server from day one.
@@ -29,7 +28,7 @@ repo-level [`packaging notes`](../../../docs/notes/packaging.md).
 
 Implemented:
 
-1. Monorepo package scaffold under `packages/`.
+1. Package scaffold and `pi` manifest.
 2. Pi extension loads from the package.
 3. `scaffold_artifact` creates markdown bundles:
    - `manifest.json`

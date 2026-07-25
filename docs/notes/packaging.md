@@ -1,6 +1,8 @@
-# Pi Packages — Monorepo Reference Notes
+# Pi Packages — Reference Notes
 
 Conceptual outline for building and publishing packages for the Pi coding agent. No code/commands — just the model to reason from.
+
+> **History:** this repo started as a `packages/*` monorepo (`pi-packages`) and was flattened to one repo per package while `pi-artifacts` was still the only package. See [Repo strategy](#repo-strategy-the-chosen-approach) for why.
 
 ## The catalog & discovery
 
@@ -20,26 +22,26 @@ Conceptual outline for building and publishing packages for the Pi coding agent.
 
 - **Pi core packages** → declared as **peer dependencies** (wildcard range), never bundled. Pi provides them at runtime.
 - **Third-party runtime deps** → normal dependencies. Pi installs them automatically on package install.
-- **Runtime deps must be in `dependencies`, never `devDependencies`.** Package installs run `npm install --omit=dev`, so `devDependencies` are not present at runtime. Anything an extension imports when it runs (validation/format/lint libs, runtime libs) belongs in `dependencies`. The same formatters/linters used only to lint this repo's own sources can stay in the workspace-root `devDependencies` — a separate concern.
+- **Runtime deps must be in `dependencies`, never `devDependencies`.** Package installs run `npm install --omit=dev`, so `devDependencies` are not present at runtime. Anything an extension imports when it runs (validation/format/lint libs, runtime libs) belongs in `dependencies`. Tooling used only to lint the repo's own sources stays in `devDependencies` — a separate concern.
 - **Depending on another Pi package** is the exception → must be bundled (`dependencies` + `bundledDependencies`), not peered.
 - The "files" list controls what actually ships in the npm tarball: resource dirs + README only (internal `docs/` stay out of the tarball).
 
-## Monorepo strategy (the chosen approach)
+## Repo strategy (the chosen approach)
 
-- One repo, multiple publishable packages under a `packages/` workspace. The **repo root is private** and never published; each package publishes independently.
+- **One repo per publishable package.** The repo root _is_ the package: root `package.json` is the published manifest (not `private`, no `workspaces`), resource directories sit at the top level, and the root `README.md` is both the GitHub landing page and the npm page.
 - Each package is its **own npm package** → its **own catalog entry** → independently installable and versioned.
 - Why this over alternatives:
   - **vs. one giant package**: users can install just the piece they want; each is independently discoverable. Use a single package only when the pieces are meaningless apart (e.g. an extension plus the skill that drives it).
-  - **vs. many separate repos**: shared tooling, one place to track everything, one CI/release setup — without losing the per-package catalog entries.
-- Keep core Pi packages in the **workspace-root dev dependencies** too, so local development resolves the same imports the published packages get at runtime.
+  - **vs. a `packages/*` monorepo**: the headline monorepo win is workspace-linked internal deps — and Pi rules that out. A Pi package depending on another Pi package **must be bundled** (see the dependency model above), not peered or workspace-linked, so cross-package sharing requires real publishing either way. That leaves shared config as the only benefit, which is a template-repo problem, not a monorepo problem. Against it: a monorepo gives a landing README about the repo rather than the package, ambiguous tags (`pi-artifacts@0.9.0` vs `v0.9.0`), CI that runs everything on every push, and a fuzzier source-review surface for a package type users are told to review before installing.
+- **Publishing is unaffected by repo layout.** The npm scope belongs to the account, not the repo; package name, version history, `pi update`, and catalog indexing all key on the npm package name. Only `repository`/`bugs`/`homepage` metadata reference the repo.
 
 ### Repo setup defaults
 
-- Use **npm workspaces** unless there is a specific reason to choose another package manager; Pi installs npm/git packages with `npm install`, so npm workspaces keep local development closest to installed behavior.
-- Keep the root `package.json` private and place publishable packages under `packages/*`.
-- Put package-specific runtime dependencies in each package's `dependencies`; put shared dev tooling and Pi core type packages in the workspace root `devDependencies`.
-- Give every publishable package a tight `files` list from the start: resource directories (`extensions`, `skills`, `prompts`, `themes`) plus README/docs/assets needed at runtime/catalog time.
+- Keep the root `package.json` publishable: `pi-package` keyword, `pi` manifest, tight `files` list, `publishConfig.access: "public"` for scoped names.
+- Put runtime dependencies in `dependencies`; keep repo-only tooling in `devDependencies`. Pi core packages and `typebox` go in **both** `peerDependencies` (`"*"`) and `devDependencies` (concrete version), so local development resolves the same imports the published package gets at runtime.
+- Give the package a tight `files` list from the start: resource directories (`extensions`, `skills`, `prompts`, `themes`) plus README/LICENSE and any assets needed at runtime/catalog time.
 - Add `pi.image` or `pi.video` later when there is a meaningful preview for the catalog.
+- For package #2, copy the config set (`biome.json`, `knip.json`, `tsconfig.json`, `.markdownlint-cli2.yaml`, `.editorconfig`, `.github/workflows/ci.yml`) from this repo, or extract a template repo once the duplication actually bites.
 
 ### Formatter config (`biome.json`) — why it exists
 
@@ -50,7 +52,7 @@ which silently re-tabs edited files and then fails `prettier --check` right
 before publish (it bit 0.2.0 and 0.3.0). The root `biome.json` pins biome to
 `indentStyle: space`, `indentWidth: 2`, so the agent's auto-format agrees with
 Prettier. Biome discovers it by walking up from each edited file, so one
-root file covers the whole monorepo. It is repo-root only (not in any package's
+root file covers the whole repo. It is repo-root only (not in the package's
 `files`), so it never ships in a tarball. Verified empirically: with the config,
 `biome format` reports "No fixes applied" on Prettier-clean files; without it,
 biome re-tabs them.
@@ -65,7 +67,7 @@ Conventions that apply to every extension-bearing package in this repo, verified
 
 ### Naming
 
-- **Repo**: `pi-packages` on GitHub (private root, never published; name just mirrors `pi.dev/packages`).
+- **Repo**: one per package, named for the package → `pi-artifacts` on GitHub.
 - **Packages**: scoped under the GitHub/npm username → `@jakeryderv/pi-*`.
 - **First package**: `@jakeryderv/pi-artifacts`.
 - The npm identity is what appears in install commands and catalog entries — the repo name is just a human label.
@@ -75,7 +77,7 @@ Conventions that apply to every extension-bearing package in this repo, verified
 - **Develop**: run Pi with the working copy loaded live; edit and re-run. Optionally install locally into a real project to test the installed shape.
 - **Publish**: bump version, publish each package to npm independently (scoped packages need public access, especially on first publish).
 - **Update (user side)**: Pi compares installed vs latest npm version and pulls latest on update. Pinned-version installs are never auto-updated — so cut real semver bumps for changes to propagate.
-- **Release automation**: a conventional-commits → auto-changelog → version-bump → auto-publish flow works well per-package in a monorepo. Worth setting up once the package count grows.
+- **Release automation**: a conventional-commits → auto-changelog → version-bump → auto-publish flow is simpler per-repo than per-package-in-a-monorepo (tags are unambiguous, one version per repo). Worth setting up once release cadence picks up.
 
 ## Sources of truth & caveats
 

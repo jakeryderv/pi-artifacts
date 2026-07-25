@@ -16,7 +16,7 @@ npm run typecheck
 npm test
 npm run format:check
 npm run lint:md
-npm run pack:artifacts -- --json
+npm run pack:check -- --json
 ```
 
 Then summarize:

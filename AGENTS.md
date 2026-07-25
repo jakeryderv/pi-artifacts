@@ -1,30 +1,33 @@
-# pi-packages — Repo Guide
+# pi-artifacts — Repo Guide
 
-Monorepo of independently-published packages for the Pi coding agent. The repo
-root is **private and never published**; each package under `packages/*`
-publishes to npm independently under `@jakeryderv/pi-*` with its own catalog entry.
+Single-package repo for `@jakeryderv/pi-artifacts`, a package for the Pi coding
+agent. The repo root **is** the published package: `package.json` at the root
+carries the `pi-package` keyword, the `pi` manifest, and a tight `files` list, so
+the repo has exactly one npm identity and one catalog entry.
+
+One package per repo is deliberate. Pi requires a package that depends on
+another Pi package to **bundle** it (`dependencies` + `bundledDependencies`)
+rather than peer it, so a workspace buys no runtime linkage — only coordination
+overhead. Future `@jakeryderv/pi-*` packages get their own repos.
 
 ## Documentation placement
 
-- **Co-locate docs with their scope.** Repo-level material → root `docs/`.
-  Package-specific material → `packages/<pkg>/docs/`.
-- **Within any scope:** settled docs in `docs/`, exploratory/thinking notes in
-  `docs/notes/`.
-- **Only the package `README.md` ships to npm** (it's in `files`). Internal
-  `docs/` stay git-tracked but out of the tarball.
-- Do **not** put package-specific design/roadmap docs in the root `docs/`.
+- **Settled docs in `docs/`, exploratory/thinking notes in `docs/notes/`.**
+- **Only `README.md` ships to npm** (it's in `files`). Internal `docs/` stay
+  git-tracked but out of the tarball.
 
 ## Package conventions
 
-- npm workspaces. Root `package.json` is `private`. Each package declares the
-  `pi-package` keyword, a `pi` manifest, and a tight `files` list (resource
-  dirs + README only).
+- Root `package.json` is the publishable manifest — it is **not** `private` and
+  declares no `workspaces`.
 - **Peer deps** `"*"` for Pi core imports (`@earendil-works/pi-*`) and `typebox`;
-  declare only what is actually imported. Pi provides them at runtime.
+  declare only what is actually imported. Pi provides them at runtime. The same
+  names also sit in `devDependencies` at a concrete version so local development
+  resolves them.
 - **Runtime deps go in `dependencies`** — package installs run
-  `npm install --omit=dev`, so `devDependencies` are absent at runtime.
-  Repo-hygiene-only linters/formatters may live in the workspace-root
-  `devDependencies`.
+  `npm install --omit=dev`, so `devDependencies` are absent at runtime. Anything
+  an extension imports when it runs belongs in `dependencies`. Repo-hygiene-only
+  tooling (`markdownlint-cli2`, `typescript`) stays in `devDependencies`.
 - **Extensions:** no background work (sockets/servers/watchers/timers) in the
   factory function. Start session-scoped resources in `session_start` (or lazily
   on first use); tear them down in an idempotent `session_shutdown`.
@@ -38,22 +41,23 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
 
 ## Dev & test workflow
 
-- **Iterate** by loading a package for one run from a scratch temp dir:
-  `cd "$(mktemp -d)" && pi -e /abs/path/to/packages/<pkg>`. This is ephemeral
+- **Iterate** by loading the package for one run from a scratch temp dir:
+  `cd "$(mktemp -d)" && pi -e /abs/path/to/pi-artifacts`. This is ephemeral
   (writes nothing persistent, no trust prompt) and loads your full global
   environment plus the package. No hot reload on `-e` — restart, or symlink the
-  package into `~/.pi/agent/extensions/` for `/reload`.
-- **Never add in-repo packages (`./packages/*`) to `.pi/settings.json`.** That
-  file is for external catalog packages only. In-repo packages are tested via
-  `-e`, not installed into the repo.
-- **Before publishing:** `npm run typecheck`, then `npm pack --dry-run` inside
-  the package to confirm the tarball contains only resource dirs + README (no
-  `docs/`, no `node_modules/`).
+  repo into `~/.pi/agent/extensions/` for `/reload`.
+- **Never add this repo to its own `.pi/settings.json`.** That file is for
+  external catalog packages only; the local package is tested via `-e`.
+- **Before publishing:** `npm run typecheck`, `npm test`, then
+  `npm run pack:check` to confirm the tarball contains only `extensions/`,
+  `skills/`, `README.md`, and `LICENSE` (no `docs/`, `test/`, or config files).
 
 ## Publishing
 
-- Scoped packages publish with public access. Start at `0.0.0`; cut real semver
-  bumps so `pi update` propagates changes to installs.
+- Publishes with public access under `@jakeryderv/pi-artifacts`. Cut real semver
+  bumps so `pi update` propagates changes to installs. The npm scope belongs to
+  the account, not the repo — the package identity and version history are
+  unaffected by repo moves or renames.
 
 ## Project `.pi/`
 

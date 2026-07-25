@@ -67,8 +67,7 @@ interface HighlightJsLike {
 const MarkdownIt = require("markdown-it") as MarkdownItConstructor;
 // `lib/common` bundles the ~40 common grammars instead of all ~190.
 const hljsModule = require("highlight.js/lib/common") as
-  | HighlightJsLike
-  | { default: HighlightJsLike };
+  HighlightJsLike | { default: HighlightJsLike };
 const hljs = "default" in hljsModule ? hljsModule.default : hljsModule;
 const footnotePlugin = require("markdown-it-footnote") as (
   md: MarkdownItInstance,

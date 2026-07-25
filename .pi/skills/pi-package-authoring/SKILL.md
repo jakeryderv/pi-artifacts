@@ -5,19 +5,21 @@ description: Author, review, or maintain Pi coding-agent packages in this repo. 
 
 # Pi Package Authoring
 
-Use this skill for package work in `pi-packages`.
+Use this skill for package work in `pi-artifacts`.
 
 ## Core repo rules
 
-- Root repo is private and never published.
-- Publishable packages live under `packages/*` and publish independently.
-- Each package needs:
+- This repo is a single package: the root `package.json` is the published
+  manifest for `@jakeryderv/pi-artifacts`. It is not private and has no
+  `workspaces`.
+- The package needs:
   - `keywords: ["pi-package"]`
   - a `pi` manifest, unless conventional discovery is intentional
   - a tight `files` list
-  - package-specific docs under `packages/<pkg>/docs/`
-- Only package `README.md` ships by default. Internal `docs/` are git-tracked but
-  excluded from npm tarballs unless intentionally added to `files`.
+  - docs under `docs/` (settled) and `docs/notes/` (exploratory)
+- Only `README.md` ships by default. Internal `docs/` and `test/` are
+  git-tracked but excluded from npm tarballs unless intentionally added to
+  `files`.
 
 ## Dependency rules
 
@@ -27,8 +29,11 @@ Use this skill for package work in `pi-packages`.
   - `@earendil-works/pi-agent-core`
   - `@earendil-works/pi-tui`
   - `typebox`
-- Runtime imports go in the package's `dependencies`, not root dev deps.
-- Repo-only tooling stays in root `devDependencies`.
+- Runtime imports go in `dependencies`, never `devDependencies` — installs run
+  `npm install --omit=dev`.
+- Repo-only tooling (`markdownlint-cli2`, `typescript`) stays in
+  `devDependencies`. Pi core packages and `typebox` appear in both
+  `peerDependencies` (`"*"`) and `devDependencies` (concrete version).
 - Do not bundle Pi core packages.
 
 ## Extension rules
@@ -45,8 +50,8 @@ Use this skill for package work in `pi-packages`.
 ## Local project `.pi/` rules
 
 - Keep `.pi/settings.json` for external, reviewed catalog packages only.
-- Do not add in-repo packages such as `./packages/*` to `.pi/settings.json`.
-- Test in-repo packages with `pi -e /absolute/path/to/packages/<pkg>`.
+- Do not add this repo's own package (`.`) to `.pi/settings.json`.
+- Test the local package with `pi -e /absolute/path/to/pi-artifacts`.
 - Do not edit generated `.pi/npm/` or `.pi/git/` contents.
 
 ## Preflight before publish or handoff
@@ -58,15 +63,15 @@ npm run typecheck
 npm test
 npm run format:check
 npm run lint:md
-npm run pack:artifacts -- --json
+npm run pack:check -- --json
 ```
 
-For package tarballs, confirm only expected runtime resources ship. For
-`pi-artifacts`, docs and tests should remain excluded unless intentionally
-changed.
+Confirm only expected runtime resources ship: `extensions/`, `skills/`,
+`README.md`, `LICENSE`. Docs, tests, and root config files should remain
+excluded unless intentionally changed.
 
 ## README/package files check
 
-If package `files` excludes `docs/`, package README links should not point to
-relative `docs/...` paths that will be broken on npm. Use GitHub URLs or include
-`docs/` intentionally.
+Because `files` excludes `docs/`, `README.md` links must not point to relative
+`docs/...` paths that will be broken on npm. Use GitHub URLs or include `docs/`
+intentionally.

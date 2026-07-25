@@ -8,7 +8,7 @@ const PREFLIGHT_COMMANDS = {
   test: "npm test",
   format: "npm run format:check",
   markdown: "npm run lint:md",
-  pack: "npm run pack:artifacts",
+  pack: "npm run pack:check",
 } as const;
 
 const RELEVANT_PROMPT_PATTERN =
@@ -62,9 +62,14 @@ function collectPathLikeInputs(input: unknown): string[] {
   return paths;
 }
 
+// This repo IS the package, so a local install reference in settings.json looks
+// like "." / "./" / "file:." / any path ending in the repo directory.
+const LOCAL_PACKAGE_REFERENCE =
+  /["'](?:file:)?(?:\.\.?\/?|[^"']*\/pi-artifacts\/?)["']/i;
+
 function proposedTextMentionsLocalPackageInstall(input: unknown): boolean {
   return collectStrings(input).some((text) =>
-    /(["']?\.\.?)?\/?packages\/[a-z0-9._-]+/i.test(text),
+    LOCAL_PACKAGE_REFERENCE.test(text),
   );
 }
 
@@ -164,18 +169,18 @@ export default function (pi: ExtensionAPI) {
         return {
           block: true,
           reason:
-            "Do not add in-repo ./packages/* packages to .pi/settings.json; use pi -e for local package testing.",
+            "Do not add this repo's own package to .pi/settings.json; use pi -e for local package testing.",
         };
       }
 
       if (
-        /packages\/[^/]+\/README\.md$/.test(normalizePath(ctx.cwd, path)) &&
+        normalizePath(ctx.cwd, path) === resolve(ctx.cwd, "README.md") &&
         proposedTextMentionsRelativeDocsLinks(input)
       ) {
         return {
           block: true,
           reason:
-            "Package README files ship without docs/ by default; use GitHub docs links or intentionally include docs/ in package files.",
+            "The package README ships without docs/ by default; use GitHub docs links or intentionally include docs/ in package files.",
         };
       }
     }

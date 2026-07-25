@@ -50,8 +50,7 @@ async function createHarness(): Promise<RuntimeHarness> {
   const chartInstances: Array<{ destroyed: boolean }> = [];
   const window = {
     PiArtifactData: undefined as
-      | { publish: (name: string, value: unknown) => void }
-      | undefined,
+      { publish: (name: string, value: unknown) => void } | undefined,
     Chart: class {
       destroyed = false;
 
