@@ -1,3 +1,14 @@
 {
-  "ignoreDependencies": ["@earendil-works/pi-coding-agent", "typebox"]
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "extensions/index.ts",
+    "extensions/runtime/*.js",
+    ".pi/extensions/*/index.ts",
+    "test/*.test.ts"
+  ],
+  "project": [
+    "extensions/**/*.{ts,js}",
+    "test/**/*.ts",
+    ".pi/extensions/**/*.ts"
+  ]
 }

@@ -26,4 +26,5 @@ jobs:
       - run: npm test
       - run: npm run format:check
       - run: npm run lint:md
+      - run: npm run lint:deps
       - run: npm run pack:check -- --json

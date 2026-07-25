@@ -21,14 +21,14 @@ import type { ViewerWindowMode } from "./viewer-launcher.ts";
  */
 export type ViewerModePreference = ViewerWindowMode;
 
-export interface ViewerConfig {
+interface ViewerConfig {
   viewerMode?: ViewerModePreference;
   autoOpen?: boolean;
 }
 
 const VALID_MODES: readonly ViewerModePreference[] = ["app", "browser", "none"];
 
-export function viewerConfigPath(): string {
+function viewerConfigPath(): string {
   return join(homedir(), CONFIG_DIR_NAME, "artifacts", "config.json");
 }
 

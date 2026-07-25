@@ -33,19 +33,19 @@ export function artifactsRoot(): string {
   return join(homedir(), CONFIG_DIR_NAME, "artifacts");
 }
 
-export function artifactPath(id: string, root = artifactsRoot()): string {
+function artifactPath(id: string, root = artifactsRoot()): string {
   return join(root, id);
 }
 
-export function manifestPath(id: string, root = artifactsRoot()): string {
+function manifestPath(id: string, root = artifactsRoot()): string {
   return join(artifactPath(id, root), "manifest.json");
 }
 
-export function entryFileNameForStack(stack: ArtifactStack): string {
+function entryFileNameForStack(stack: ArtifactStack): string {
   return getArtifactRenderer(stack).entryFile;
 }
 
-export function entryPath(
+function entryPath(
   id: string,
   stack: ArtifactStack,
   root = artifactsRoot(),

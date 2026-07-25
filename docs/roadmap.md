@@ -2,9 +2,9 @@
 
 This is the implementation roadmap for `@jakeryderv/pi-artifacts`. The pinned
 contract lives in [`./api.md`](./api.md), and historical product/design notes
-live in `docs/notes/design.md`. Cross-cutting repo conventions
+live in [`./notes/design.md`](./notes/design.md). Cross-cutting repo conventions
 (dependency placement, extension lifecycle, rebrand-safe paths) live in the
-repo-level [`packaging notes`](../../../docs/notes/packaging.md).
+repo-level [`packaging notes`](./notes/packaging.md).
 
 ## Settled foundations
 

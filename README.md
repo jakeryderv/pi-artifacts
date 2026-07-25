@@ -17,6 +17,16 @@ Chart.js) — in a session-scoped viewer.
 > and [design notes](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/notes/design.md)
 > for the broader plan.
 
+## What's new in 0.9.1
+
+Maintenance release — no artifact-authoring behavior changed.
+
+- **Corrected package metadata.** `repository` and `homepage` now point at
+  `github.com/jakeryderv/pi-artifacts`; the 0.9.0 metadata still referenced the
+  former monorepo path, so the links on npm resolved to a missing directory.
+- Releases are now published from CI on a `v*` tag using npm trusted publishing,
+  so this and later versions carry a provenance attestation.
+
 ## What's new in 0.9.0
 
 - **Portable single-file HTML export** for both markdown and html artifacts via
@@ -174,6 +184,7 @@ npm install
 # checks
 npm run typecheck
 npm test
+npm run lint:deps     # knip: unreachable files, unused exports, stray deps
 npm run pack:check    # confirm the published tarball contents
 
 # load the package for one isolated run from a scratch directory

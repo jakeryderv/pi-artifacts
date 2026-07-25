@@ -16,6 +16,7 @@ npm run typecheck
 npm test
 npm run format:check
 npm run lint:md
+npm run lint:deps
 npm run pack:check -- --json
 ```
 

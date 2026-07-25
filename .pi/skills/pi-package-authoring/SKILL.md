@@ -63,6 +63,7 @@ npm run typecheck
 npm test
 npm run format:check
 npm run lint:md
+npm run lint:deps
 npm run pack:check -- --json
 ```
 
@@ -75,3 +76,17 @@ excluded unless intentionally changed.
 Because `files` excludes `docs/`, `README.md` links must not point to relative
 `docs/...` paths that will be broken on npm. Use GitHub URLs or include `docs/`
 intentionally.
+
+## Release procedure
+
+Releases are tag-triggered, never published from a laptop:
+
+1. Bump `version` in the root `package.json` and update the README's
+   "What's new" section.
+2. Commit, push `main`, and confirm the `ci` workflow is green.
+3. Push a matching `v<version>` tag. `.github/workflows/release.yml` re-runs the
+   preflight and publishes over npm trusted publishing (OIDC), which also
+   attaches a provenance attestation.
+
+The workflow fails if the tag and `package.json` version disagree. Tags from the
+monorepo era use the older `pi-artifacts-v*` form; new tags are `v*`.

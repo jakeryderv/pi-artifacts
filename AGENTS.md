@@ -48,12 +48,25 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
   repo into `~/.pi/agent/extensions/` for `/reload`.
 - **Never add this repo to its own `.pi/settings.json`.** That file is for
   external catalog packages only; the local package is tested via `-e`.
-- **Before publishing:** `npm run typecheck`, `npm test`, then
-  `npm run pack:check` to confirm the tarball contains only `extensions/`,
+- **Before publishing:** `npm run typecheck`, `npm test`, `npm run lint:deps`,
+  then `npm run pack:check` to confirm the tarball contains only `extensions/`,
   `skills/`, `README.md`, and `LICENSE` (no `docs/`, `test/`, or config files).
+- `lint:deps` is knip: it fails on unreachable files, unused exports, and
+  undeclared/unused dependencies. Browser runtime assets and extension entry
+  points are declared as `entry` in `knip.json` — add new ones there rather than
+  ignoring the finding.
 
 ## Publishing
 
+- **Releases are tag-triggered.** Bump `version`, commit, then push a `v<version>`
+  tag; `.github/workflows/release.yml` re-runs the full preflight and publishes.
+  Do not `npm publish` from a laptop — the workflow is the only trusted publisher.
+- Auth is npm **trusted publishing** (OIDC, `id-token: write`), so there is no
+  `NPM_TOKEN` secret and every release carries a provenance attestation. The
+  one-time npm-side grant is
+  `npm trust github @jakeryderv/pi-artifacts --repo jakeryderv/pi-artifacts --file release.yml --allow-publish`.
+- The tag must match `package.json` `version` — the workflow fails the release if
+  they diverge.
 - Publishes with public access under `@jakeryderv/pi-artifacts`. Cut real semver
   bumps so `pi update` propagates changes to installs. The npm scope belongs to
   the account, not the repo — the package identity and version history are

@@ -1,0 +1,61 @@
+name: release
+
+# Publishes @jakeryderv/pi-artifacts when a v* tag is pushed. Authentication is
+# npm trusted publishing (OIDC) — no NPM_TOKEN secret. One-time setup on the npm
+# side, run locally by a package owner:
+#
+#   npm trust github @jakeryderv/pi-artifacts \
+#     --repo jakeryderv/pi-artifacts --file release.yml --allow-publish
+#
+# Publishing over OIDC also attaches a provenance attestation automatically.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      # Required for the OIDC token used by trusted publishing and provenance.
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm >= 11.5.1, newer than some Node 24 images.
+      - run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - name: Verify tag matches package version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match package.json version ${pkg}" >&2
+            exit 1
+          fi
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run format:check
+      - run: npm run lint:md
+      - run: npm run lint:deps
+      - run: npm run pack:check -- --json
+
+      - run: npm publish
