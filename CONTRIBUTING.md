@@ -50,13 +50,15 @@ To exercise the complete package for one Pi run without changing persistent Pi
 settings:
 
 ```bash
-cd "$(mktemp -d)"
-pi -e /absolute/path/to/pi-artifacts
+npm run dev
 ```
 
-Restart Pi after source changes because `-e` does not hot reload. Do not add this
-repository to its own `.pi/settings.json`; that file is reserved for external
-catalog packages used by the project.
+The launcher resolves the repository path, runs Pi from a temporary directory,
+and removes that directory when Pi exits. Pass additional Pi arguments after
+`--`, for example `npm run dev -- --model <provider/model>`. Restart Pi after
+source changes because `-e` does not hot reload. Do not add this repository to
+its own `.pi/settings.json`; that file is reserved for external catalog packages
+used by the project.
 
 ## Package conventions
 

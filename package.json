@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/jakeryderv/pi-artifacts#readme",
   "scripts": {
+    "dev": "node scripts/dev.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.ts",
     "format": "prettier --write .",

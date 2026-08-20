@@ -44,11 +44,12 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
 
 ## Dev & test workflow
 
-- **Iterate** by loading the package for one run from a scratch temp dir:
-  `cd "$(mktemp -d)" && pi -e /abs/path/to/pi-artifacts`. This is ephemeral
-  (writes nothing persistent, no trust prompt) and loads your full global
-  environment plus the package. No hot reload on `-e` — restart, or symlink the
-  repo into `~/.pi/agent/extensions/` for `/reload`.
+- **Iterate** with `npm run dev`. The repository-only launcher resolves the
+  package path, loads it with `pi -e` from a scratch temp dir, forwards arguments
+  after `--`, and removes the temp dir when Pi exits. This is ephemeral (writes
+  nothing persistent, no trust prompt) and loads your full global environment
+  plus the package. No hot reload on `-e` — restart, or symlink the repo into
+  `~/.pi/agent/extensions/` for `/reload`.
 - **Never add this repo to its own `.pi/settings.json`.** That file is for
   external catalog packages only; the local package is tested via `-e`.
 - **Before publishing:** `npm run typecheck`, `npm test`, `npm run lint:deps`,

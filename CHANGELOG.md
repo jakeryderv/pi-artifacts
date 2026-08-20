@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `npm run dev` to load the working copy in Pi from an automatically cleaned
+  temporary directory.
+
 ### Changed
 
 - Split contributor guidance, security policy and architecture, and release
