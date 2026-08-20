@@ -13,8 +13,11 @@ overhead. Future `@jakeryderv/pi-*` packages get their own repos.
 ## Documentation placement
 
 - **Settled docs in `docs/`, exploratory/thinking notes in `docs/notes/`.**
-- **Only `README.md` ships to npm** (it's in `files`). Internal `docs/` stay
-  git-tracked but out of the tarball.
+- Root community/release docs are deliberate exceptions: `CONTRIBUTING.md`,
+  `SECURITY.md`, and `CHANGELOG.md`. GitHub surfaces the first two, and the
+  changelog is the curated release record.
+- **Only `README.md` ships to npm** (it's in `files`). Root community docs and
+  internal `docs/` stay git-tracked but out of the tarball.
 
 ## Package conventions
 
@@ -61,6 +64,8 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
 - **Releases are tag-triggered.** Bump `version`, commit, then push a `v<version>`
   tag; `.github/workflows/release.yml` re-runs the full preflight and publishes.
   Do not `npm publish` from a laptop — the workflow is the only trusted publisher.
+- Move notable `CHANGELOG.md` entries from `Unreleased` into the dated release
+  before creating the release commit and tag.
 - Auth is npm **trusted publishing** (OIDC, `id-token: write`), so there is no
   `NPM_TOKEN` secret and every release carries a provenance attestation. It
   depends on a one-time grant configured on npmjs.com (package → Settings →

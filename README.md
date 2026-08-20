@@ -1,99 +1,14 @@
 # @jakeryderv/pi-artifacts
 
-Rich visualization artifacts for the [Pi coding agent](https://pi.dev/). Scaffold,
-validate, and preview artifact bundles — portable markdown documents and an
-interactive html stack (declarative components, Pico CSS, and CSP-clean
-Chart.js) — in a session-scoped viewer.
+Rich visualization artifacts for the [Pi coding agent](https://pi.dev/).
+Scaffold, validate, preview, manage, and export portable Markdown documents and
+declarative HTML dashboards from a Pi session.
 
-> **Status: markdown + declarative html, live viewer + single-file export.** The package can scaffold markdown
-> and html artifact bundles, validate/normalize them, serve localhost previews,
-> and show a session-scoped browser gallery via `/viewer` that updates live
-> (Server-Sent Events) as artifacts are rendered or deleted — and open artifact
-> pages reload themselves when re-rendered. html artifacts get a shared runtime
-> (Pico CSS, components, file-backed feeds, Chart.js, Mermaid, icons) injected
-> under a strict CSP. See
-> the [roadmap](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/roadmap.md),
-> [API contract](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/api.md),
-> and [design notes](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/notes/design.md)
-> for the broader plan.
-
-## What's new in 0.9.2
-
-Security and dependency-hardening maintenance release — no artifact-authoring
-behavior changed.
-
-- **Stronger store containment.** Artifact loading now resolves the real store,
-  bundle, and entry paths before validation or rendering, rejecting entry-file
-  and bundle-directory symlinks that escape their intended boundaries.
-- **Patched dependency tree.** The Mermaid minimum now excludes vulnerable
-  11.16.0 installs, the lockfile resolves patched Mermaid, DOMPurify, and
-  brace-expansion releases, and the development toolchain has been refreshed.
-
-## What's new in 0.9.1
-
-Maintenance release — no artifact-authoring behavior changed.
-
-- **Corrected package metadata.** `repository` and `homepage` now point at
-  `github.com/jakeryderv/pi-artifacts`; the 0.9.0 metadata still referenced the
-  former monorepo path, so the links on npm resolved to a missing directory.
-- Releases are now published from CI on a `v*` tag using npm trusted publishing,
-  so this and later versions carry a provenance attestation.
-
-## What's new in 0.9.0
-
-- **Portable single-file HTML export** for both markdown and html artifacts via
-  `export_artifact` or the viewer's per-artifact Export action.
-- Package runtime CSS/JavaScript, KaTeX fonts, icons, referenced images, and
-  artifact-local JSON feeds are embedded into the exported document.
-- Exports carry their own restrictive CSP, authorize only embedded package-owned
-  runtime scripts, and remove authored executable scripts, event handlers, and
-  `javascript:` URLs.
-
-## What's new in 0.8.1
-
-- **Correct Markdown math boundaries**: KaTeX rendering now operates on parsed
-  Markdown text tokens, preserving dollar-delimited text inside inline and fenced
-  code as code and avoiding ambiguous currency pairs.
-- **Safer store operations**: artifact IDs must be one generated slug segment,
-  and concurrent manifest updates use independent atomic temporary files.
-- **Dependency hardening**: the minimum `markdown-it` version is raised to the
-  patched 14.3 release line.
-
-## What's new in 0.8.0
-
-- **Declarative HTML components**: package-owned `<pi-grid>`, `<pi-card>`,
-  `<pi-metric>`, `<pi-chart>`, and `<pi-table>` Web Components provide a
-  consistent dashboard vocabulary without authored JavaScript or a build step.
-- **Artifact-local data feeds**: `<pi-data-source>` loads one-shot JSON snapshots
-  from the bundle's `assets/` directory and binds them to metrics, charts, and
-  tables with `data-feed` and optional dotted `field` paths.
-- **Viewer hardening**: artifact content, gallery pages, and SSE now use a random
-  per-server capability path; the preview server starts lazily and adds no-store
-  and same-origin resource headers.
-- **Cleaner internals and launcher lifecycle**: renderer selection is centralized
-  in a typed registry, while app mode tracks Chromium liveness, launch failure,
-  and profile cleanup more reliably.
-
-## What was new in 0.7.0
-
-- **Workspace scoping**: the viewer gallery now has a three-way scope —
-  this session / this workspace (artifacts created from the same cwd) / all
-  artifacts — and `list_artifacts` accepts an optional
-  `scope: "session" | "workspace" | "all"` parameter.
-
-## What was new in 0.6.0
-
-- **Mermaid diagrams render live** in both stacks: markdown ` ```mermaid `
-  fences and html `<pre class="mermaid">` blocks hydrate client-side under the
-  strict CSP (theme follows light/dark; syntax errors show inline). The old
-  `mermaid/not-validated` warning is gone.
-- **Syntax highlighting** for fenced code blocks with a language tag
-  (highlighted server-side via highlight.js; GitHub light/dark themes).
-- **Footnotes** (`[^1]`) now render as a linked footnotes section.
-- **Store cleanup**: new `delete_artifacts` bulk tool (by ids and/or age) and
-  `/artifacts-clean <days>` command.
-- Manifest writes are atomic (write-then-rename), hardening the shared store
-  against crashes and concurrent sessions.
+The package includes a live localhost viewer, a content-only HTML component
+runtime, artifact-local JSON feeds, Chart.js and Mermaid rendering, and portable
+single-file HTML export. See the
+[changelog](https://github.com/jakeryderv/pi-artifacts/blob/main/CHANGELOG.md)
+for release history.
 
 ## Install
 
@@ -101,7 +16,7 @@ Maintenance release — no artifact-authoring behavior changed.
 pi install npm:@jakeryderv/pi-artifacts
 ```
 
-To try it for a single run without adding it to your Pi settings:
+Try it for one run without changing Pi settings:
 
 ```bash
 pi -e npm:@jakeryderv/pi-artifacts
@@ -109,101 +24,82 @@ pi -e npm:@jakeryderv/pi-artifacts
 
 ## Quickstart
 
-After installing or loading the package, ask Pi to create and render an artifact:
+Ask Pi to create and render an artifact:
 
 ```text
 Create a markdown artifact titled "Demo Report" with a heading, a short note callout, a task list, and a small table. Then render it.
 ```
 
-Or an html dashboard with a chart:
+Or create an HTML dashboard:
 
 ```text
 Create an html artifact titled "Q4 Dashboard" with a summary section and a bar chart of quarterly revenue. Then render it.
 ```
 
-Pi will scaffold a bundle, write the entry file, validate it, and return
-a localhost preview URL. Run `/viewer` to open the artifact gallery, then use
-`list_artifacts` or `delete_artifact` when you want to inspect or clean up saved
-bundles.
+Pi scaffolds a bundle, authors its entry file, validates it, and returns a
+localhost preview URL. Run `/viewer` to open the live artifact gallery.
 
-## What it provides
+## Capabilities
 
-- **`scaffold_artifact`** tool — create an empty markdown or html artifact bundle to author into.
-- **`render_artifact`** tool — validate/normalize an authored bundle and preview it on localhost.
-  - **markdown:** Prettier + markdownlint + strict KaTeX math; GFM task lists, GitHub-style alerts, footnotes, syntax-highlighted code, and Mermaid fences rendered as live diagrams.
-  - **html:** Prettier + HTMLHint + CSP/component capability checks; shared runtime (Pico CSS, declarative Web Components, artifact-local JSON feeds, Chart.js, Mermaid, and icons) injected from `/runtime`.
-- **`export_artifact`** tool — write a self-contained HTML export to
-  `<bundle>/exports/<id>.html`, with referenced assets and required runtime
-  resources embedded.
-- **`list_artifacts`** tool — list artifact bundles in the store, newest first;
-  optionally scoped to the current session or workspace (cwd).
-- **`delete_artifact`** tool — delete a bundle and all of its files from the store.
-- **`delete_artifacts`** tool — bulk-delete bundles by id list and/or age.
-- **`/artifacts-clean`** command — delete artifacts not updated in N days
-  (`/artifacts-clean 30`); with no argument, shows the store size.
-- **`/viewer`** command — open a live gallery of artifacts with a three-way
-  scope (this session / this workspace / all artifacts), search/filter
-  controls, render status badges, and auto-updating via Server-Sent Events as
-  you render or delete. Gallery and shared-shell artifact pages include a
-  persistent toolbar with navigation and a single-file Export action. Gallery
-  rows also provide direct export downloads without writing an export file.
-  Full authored HTML documents deliberately opt out of the shared shell, including
-  its toolbar and live reload. When a Chromium-family
-  browser is available it opens in a dedicated, chromeless app
-  window (isolated profile, closed on session shutdown); otherwise it falls back
-  to your default browser.
-- **`/viewer-mode`** command — set how `/viewer` opens and remember it across
-  sessions: `app` (dedicated window, default), `browser` (your default browser),
-  or `off` (just print the URL — handy over SSH/headless). Run with no argument
-  to see the current setting. One-off overrides: `PI_ARTIFACTS_VIEWER=app|browser|none`
-  (env wins over the saved setting) and `PI_ARTIFACTS_BROWSER=<path>` (choose the
-  app-mode browser binary).
-- **`/viewer-auto`** command — toggle whether a successful render auto-shows the
-  artifact: `on` (default) or `off`. When on, rendering opens the viewer if it
-  isn't already; if a window is already open it switches to the freshly rendered
-  artifact (no new window). Honors `/viewer-mode off` (stays quiet on
-  SSH/headless). Run with no argument to see the current setting.
-- **`artifacts-authoring`** skill — how to author portable markdown and html artifacts.
+### Artifact stacks
 
-Artifacts are stored as content-only bundles under `~/.pi/artifacts/<id>/`
-(`manifest.json` + entry file + `assets/`), keyed to their originating session
-via provenance metadata in the manifest. Tool-generated standalone files live
-under the bundle's `exports/` directory.
+- **Markdown:** Prettier, markdownlint, strict KaTeX math, task lists,
+  GitHub-style alerts, footnotes, syntax highlighting, and Mermaid diagrams.
+- **HTML:** Prettier, HTMLHint, Pico CSS, declarative components, artifact-local
+  JSON feeds, Chart.js, Mermaid, and icons—with no authored JavaScript or build
+  step.
+- **Standalone export:** one self-contained HTML file with required runtime
+  resources and bundle assets embedded for offline use.
+
+### Tools
+
+| Tool                | Purpose                                                  |
+| ------------------- | -------------------------------------------------------- |
+| `scaffold_artifact` | Create an empty Markdown or HTML bundle to author into.  |
+| `render_artifact`   | Validate, normalize, and preview a bundle.               |
+| `export_artifact`   | Write a portable single-file HTML export.                |
+| `list_artifacts`    | List bundles by session, workspace, or across the store. |
+| `delete_artifact`   | Delete one bundle and its files.                         |
+| `delete_artifacts`  | Bulk-delete bundles by ID and/or age.                    |
+
+### Commands
+
+| Command                          | Purpose                                              |
+| -------------------------------- | ---------------------------------------------------- |
+| `/viewer`                        | Open the searchable, live-updating artifact gallery. |
+| `/viewer-mode app\|browser\|off` | Choose and persist how the viewer opens.             |
+| `/viewer-auto on\|off`           | Control whether successful renders auto-show.        |
+| `/artifacts-clean [days]`        | Inspect store size or delete older artifacts.        |
+
+The included `artifacts-authoring` skill teaches Pi the bundle workflow and
+portable authoring conventions.
+
+## Storage
+
+Artifacts are content-only bundles stored under `~/.pi/artifacts/<id>/` by
+default, using Pi's configured directory name rather than a hardcoded `.pi`.
+Each bundle contains `manifest.json`, one entry file, `assets/`, and optional
+generated `exports/`. Provenance metadata records the originating session and
+workspace.
 
 ## Security
 
-Pi packages run with full system access. This extension serves artifact previews
-only from a localhost-bound server, scoped to the selected artifact directory,
-with an unguessable per-server capability path and restrictive
-Content-Security-Policy. html artifacts run under the same
-strict CSP (`script-src 'self'`), but the package keeps artifacts content-only:
-author-supplied inline JS, authored `<script src>` files, `on*=` handlers, and
-`javascript:` URLs are blocked or rejected, and executable runtime JS is served
-only from the package-owned `/runtime` namespace. Viewer, SSE, artifact pages,
-and artifact assets require the random capability path; `/runtime` intentionally
-remains a stable public path because it contains only immutable package-owned
-assets, never artifact content. Review the source before installing.
-Standalone exports embed a second restrictive CSP: referenced content assets are
-converted to data URLs, package-owned runtime scripts receive a random nonce,
-network connections are disabled, and authored executable hooks are removed.
+Pi packages execute with the user's system permissions, so review source before
+installation. Artifact previews bind only to localhost and use capability URLs,
+filesystem containment, restrictive Content Security Policies, and a
+package-owned runtime boundary. Read the
+[security architecture](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/security.md)
+and [reporting policy](https://github.com/jakeryderv/pi-artifacts/blob/main/SECURITY.md)
+for details.
 
-## Development
+## Documentation
 
-```bash
-# install dev + runtime dependencies
-npm install
-
-# checks
-npm run typecheck
-npm test
-npm run lint:deps     # knip: unreachable files, unused exports, stray deps
-npm run pack:check    # confirm the published tarball contents
-
-# load the package for one isolated run from a scratch directory
-cd "$(mktemp -d)"
-pi -e /absolute/path/to/pi-artifacts
-```
+- [API contract](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/api.md)
+- [Roadmap](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/roadmap.md)
+- [Security architecture](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/security.md)
+- [Changelog](https://github.com/jakeryderv/pi-artifacts/blob/main/CHANGELOG.md)
+- [Contributing](https://github.com/jakeryderv/pi-artifacts/blob/main/CONTRIBUTING.md)
 
 ## License
 
-MIT
+[MIT](LICENSE)

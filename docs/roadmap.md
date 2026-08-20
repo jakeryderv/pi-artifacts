@@ -168,25 +168,12 @@ Implemented alongside mermaid:
 - A standalone CSP disables network access, grants a random nonce only to
   package-owned runtime scripts, and authored executable hooks are removed.
 
-## Current security posture
+## Security
 
-- Artifact previews start lazily, bind only to localhost, and require an
-  unguessable per-server capability path for content-bearing routes.
-- Artifact files and runtime files are served from separate namespaces:
-  `/artifacts/<id>/...` and `/runtime/<namespace>/...`.
-- Path traversal is rejected in store APIs and server file serving.
-- HTML artifacts are declarative content, not mini web apps:
-  - inline executable `<script>` warns,
-  - authored `<script src>` warns,
-  - inline event handlers warn,
-  - `javascript:` URLs warn,
-  - artifact `.js` files are rejected by the server.
-- Runtime JavaScript is package-owned and served only from `/runtime`; that
-  stable public namespace contains no artifact data.
-- File-backed component feeds are confined to the current bundle's `assets/`
-  directory and render data-derived text with DOM `textContent`.
-- Manifest `lastRender` metadata stores the latest render status so list/viewer
-  surfaces can show OK/warning/error/never-rendered state.
+The current trust model, filesystem containment, preview-server controls,
+authored-content policy, and standalone-export protections live in
+[`security.md`](security.md). Vulnerability-reporting instructions and supported
+versions live in the repository-level [`SECURITY.md`](../SECURITY.md).
 
 ## Parked / future work
 
