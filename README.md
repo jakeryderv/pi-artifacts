@@ -17,6 +17,18 @@ Chart.js) — in a session-scoped viewer.
 > and [design notes](https://github.com/jakeryderv/pi-artifacts/blob/main/docs/notes/design.md)
 > for the broader plan.
 
+## What's new in 0.9.2
+
+Security and dependency-hardening maintenance release — no artifact-authoring
+behavior changed.
+
+- **Stronger store containment.** Artifact loading now resolves the real store,
+  bundle, and entry paths before validation or rendering, rejecting entry-file
+  and bundle-directory symlinks that escape their intended boundaries.
+- **Patched dependency tree.** The Mermaid minimum now excludes vulnerable
+  11.16.0 installs, the lockfile resolves patched Mermaid, DOMPurify, and
+  brace-expansion releases, and the development toolchain has been refreshed.
+
 ## What's new in 0.9.1
 
 Maintenance release — no artifact-authoring behavior changed.

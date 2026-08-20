@@ -3,6 +3,7 @@ import {
   mkdir,
   readdir,
   readFile,
+  realpath,
   rename,
   rm,
   stat,
@@ -184,12 +185,32 @@ export async function loadArtifact(
     throw new Error(`Artifact "${id}" entry path escapes its bundle.`);
   }
 
-  const entryStats = await stat(resolvedEntryPath).catch((error: unknown) => {
+  let realRootPath: string;
+  let realBundlePath: string;
+  let realEntryPath: string;
+  try {
+    [realRootPath, realBundlePath, realEntryPath] = await Promise.all([
+      realpath(root),
+      realpath(path),
+      realpath(resolvedEntryPath),
+    ]);
+  } catch (error) {
     if (isNodeError(error) && error.code === "ENOENT") {
       throw new Error(`Artifact "${id}" entry file is missing.`);
     }
     throw error;
-  });
+  }
+
+  if (
+    !isPathInside(realRootPath, realBundlePath) ||
+    realBundlePath === realRootPath ||
+    !isPathInside(realBundlePath, realEntryPath) ||
+    realEntryPath === realBundlePath
+  ) {
+    throw new Error(`Artifact "${id}" entry path escapes its bundle.`);
+  }
+
+  const entryStats = await stat(realEntryPath);
 
   if (!entryStats.isFile()) {
     throw new Error(`Artifact "${id}" entry is not a file.`);
@@ -200,7 +221,7 @@ export async function loadArtifact(
     path,
     manifestPath: mPath,
     manifest: parsedManifest,
-    entryPath: resolvedEntryPath,
+    entryPath: realEntryPath,
   };
 }
 

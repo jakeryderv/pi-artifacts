@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readdir,
+  readFile,
+  rm,
+  stat,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { type TestContext } from "node:test";
@@ -223,6 +232,42 @@ test("loadArtifact rejects traversal ids and manifest entry traversal", async (t
 
   await assert.rejects(
     () => loadArtifact(scaffolded.id, root),
+    /entry path escapes/,
+  );
+});
+
+test("loadArtifact rejects entry symlinks that escape the bundle", async (t) => {
+  const root = await makeTempRoot(t);
+  const scaffolded = await scaffoldArtifact({
+    title: "Symlink Escape",
+    stack: MARKDOWN_STACK,
+    cwd: "/project",
+    root,
+  });
+  const outsideEntry = join(root, "outside.md");
+  await writeFile(outsideEntry, "# Outside\n");
+  await rm(scaffolded.entry);
+  await symlink(outsideEntry, scaffolded.entry);
+
+  await assert.rejects(
+    () => loadArtifact(scaffolded.id, root),
+    /entry path escapes/,
+  );
+});
+
+test("loadArtifact rejects bundle symlinks that escape the store", async (t) => {
+  const root = await makeTempRoot(t);
+  const outsideRoot = await makeTempRoot(t);
+  const outside = await scaffoldArtifact({
+    title: "Bundle Escape",
+    stack: MARKDOWN_STACK,
+    cwd: "/project",
+    root: outsideRoot,
+  });
+  await symlink(outside.path, join(root, outside.id), "dir");
+
+  await assert.rejects(
+    () => loadArtifact(outside.id, root),
     /entry path escapes/,
   );
 });

@@ -17,8 +17,9 @@ repo-level [`packaging notes`](./notes/packaging.md).
   which is `~/.pi/artifacts/` by default but stays rebrand-safe.
 - The store is durable and cross-project; provenance ties artifacts to sessions
   via `sessionFile`/`sessionKey` in the manifest.
-- The preview server starts in `session_start` or lazily on first render and
-  closes in `session_shutdown`; no server starts in the extension factory.
+- The preview server starts lazily on `/viewer` or the first successful render
+  and closes in `session_shutdown`; no server starts in the extension factory
+  or `session_start`.
 - **`id` derivation**: `slugify(title)`, with collision handling by numeric
   suffix (`-2`, `-3`, ...).
 
