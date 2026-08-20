@@ -7,6 +7,10 @@ export interface ArtifactPageChrome {
   lastRender?: ArtifactRenderStatus;
   /** Per-server capability path that protects viewer and artifact content. */
   basePath?: string;
+  /** Package demos use their own gallery and route namespace. */
+  kind?: "artifact" | "demo";
+  /** Override the SSE id used for reload filtering and window navigation. */
+  liveReloadId?: string;
 }
 
 export function artifactChromeStyles(): string {
@@ -28,16 +32,23 @@ export function artifactChromeStyles(): string {
 export function renderArtifactToolbar(input: ArtifactPageChrome): string {
   const status = renderStatusLabel(input.lastRender);
   const basePath = input.basePath ?? "";
-  const artifactHref = `${basePath}/artifacts/${encodeURIComponent(input.id)}/`;
+  const isDemo = input.kind === "demo";
+  const route = isDemo ? "demos" : "artifacts";
+  const artifactHref = `${basePath}/${route}/${encodeURIComponent(input.id)}/`;
+  const galleryHref = isDemo ? `${basePath}/demos` : `${basePath}/viewer`;
+  const galleryLabel = isDemo ? "Demos" : "Gallery";
+  const statusBadge = isDemo
+    ? '<span class="pi-artifact-badge pi-artifact-badge-ok">Package demo</span>'
+    : `<span class="pi-artifact-badge ${status.className}">${status.label}</span>`;
 
   return `<nav class="pi-artifact-toolbar" aria-label="Artifact toolbar">
-  <a href="${basePath}/viewer">← Gallery</a>
+  <a href="${galleryHref}">← ${galleryLabel}</a>
   <div class="pi-artifact-toolbar-title">
     <strong>${escapeHtml(input.title)}</strong>
     <div class="pi-artifact-toolbar-meta">
-      <code>${escapeHtml(input.id)}</code>
+      ${isDemo ? "" : `<code>${escapeHtml(input.id)}</code>`}
       <span class="pi-artifact-badge">${escapeHtml(input.stack)}</span>
-      <span class="pi-artifact-badge ${status.className}">${status.label}</span>
+      ${statusBadge}
     </div>
   </div>
   <div class="pi-artifact-toolbar-actions">

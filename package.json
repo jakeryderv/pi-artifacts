@@ -45,6 +45,7 @@
     "typebox": "*"
   },
   "files": [
+    "demos",
     "extensions",
     "skills",
     "README.md",

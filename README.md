@@ -37,7 +37,8 @@ Create an html artifact titled "Q4 Dashboard" with a summary section and a bar c
 ```
 
 Pi scaffolds a bundle, authors its entry file, validates it, and returns a
-localhost preview URL. Run `/viewer` to open the live artifact gallery.
+localhost preview URL. Run `/viewer` to open the live artifact gallery, or
+`/artifacts-demo` to explore the package-owned Markdown and HTML showcases.
 
 ## Capabilities
 
@@ -64,12 +65,13 @@ localhost preview URL. Run `/viewer` to open the live artifact gallery.
 
 ### Commands
 
-| Command                          | Purpose                                              |
-| -------------------------------- | ---------------------------------------------------- |
-| `/viewer`                        | Open the searchable, live-updating artifact gallery. |
-| `/viewer-mode app\|browser\|off` | Choose and persist how the viewer opens.             |
-| `/viewer-auto on\|off`           | Control whether successful renders auto-show.        |
-| `/artifacts-clean [days]`        | Inspect store size or delete older artifacts.        |
+| Command                            | Purpose                                              |
+| ---------------------------------- | ---------------------------------------------------- |
+| `/viewer`                          | Open the searchable, live-updating artifact gallery. |
+| `/artifacts-demo [markdown\|html]` | Open the read-only package demo gallery or one demo. |
+| `/viewer-mode app\|browser\|off`   | Choose and persist how the viewer opens.             |
+| `/viewer-auto on\|off`             | Control whether successful renders auto-show.        |
+| `/artifacts-clean [days]`          | Inspect store size or delete older artifacts.        |
 
 The included `artifacts-authoring` skill teaches Pi the bundle workflow and
 portable authoring conventions.

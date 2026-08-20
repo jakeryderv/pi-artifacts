@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "revenue": "$248K",
+    "revenueTrend": "+18% year over year",
+    "artifacts": 126,
+    "artifactTrend": "+24 this month",
+    "passRate": "98.4%",
+    "passRateTrend": "+1.2 points"
+  },
+  "quarterlyChart": {
+    "type": "bar",
+    "data": {
+      "labels": ["Q1", "Q2", "Q3", "Q4"],
+      "datasets": [
+        {
+          "label": "Artifacts rendered",
+          "data": [18, 27, 34, 47],
+          "backgroundColor": "rgba(79, 70, 229, 0.72)"
+        }
+      ]
+    },
+    "options": {
+      "responsive": true,
+      "plugins": {
+        "legend": {
+          "display": false
+        }
+      }
+    }
+  },
+  "regions": [
+    {
+      "region": "North America",
+      "revenue": "$112K",
+      "growth": "+21%",
+      "status": "Ahead"
+    },
+    {
+      "region": "Europe",
+      "revenue": "$79K",
+      "growth": "+14%",
+      "status": "On track"
+    },
+    {
+      "region": "Asia Pacific",
+      "revenue": "$57K",
+      "growth": "+19%",
+      "status": "Ahead"
+    }
+  ]
+}

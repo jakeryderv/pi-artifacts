@@ -223,7 +223,10 @@ function replaceDisplayMathBlock(
     state.tokens[index - 1]?.type !== "paragraph_open" ||
     state.tokens[index + 1]?.type !== "paragraph_close" ||
     !token.children?.every(
-      (child) => child.type === "text" || child.type === "softbreak",
+      (child) =>
+        child.type === "text" ||
+        child.type === "text_special" ||
+        child.type === "softbreak",
     )
   ) {
     return false;
@@ -290,7 +293,10 @@ export function renderMarkdownPage(
 ): string {
   const body = markdownIt.render(markdown);
   const escapedTitle = escapeHtml(title);
-  const artifactId = typeof artifact === "string" ? artifact : artifact?.id;
+  const artifactId =
+    typeof artifact === "string"
+      ? artifact
+      : (artifact?.liveReloadId ?? artifact?.id);
   const viewerBase =
     typeof artifact === "object" ? (artifact.basePath ?? "") : "";
   const toolbar =

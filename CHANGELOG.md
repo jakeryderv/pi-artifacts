@@ -11,11 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `npm run dev` to load the working copy in Pi from an automatically cleaned
   temporary directory.
+- Add package-owned Markdown and HTML showcases with an `/artifacts-demo`
+  gallery that stays separate from the user artifact store.
 
 ### Changed
 
 - Split contributor guidance, security policy and architecture, and release
   history into dedicated documents while streamlining the package README.
+
+### Fixed
+
+- Render display-math blocks containing common backslash-prefixed KaTeX
+  commands instead of leaving their delimiters visible.
 
 ## [0.9.2] - 2026-08-20
 

@@ -16,8 +16,9 @@ overhead. Future `@jakeryderv/pi-*` packages get their own repos.
 - Root community/release docs are deliberate exceptions: `CONTRIBUTING.md`,
   `SECURITY.md`, and `CHANGELOG.md`. GitHub surfaces the first two, and the
   changelog is the curated release record.
-- **Only `README.md` ships to npm** (it's in `files`). Root community docs and
-  internal `docs/` stay git-tracked but out of the tarball.
+- **Only `README.md` ships to npm as documentation.** Root community docs and
+  internal `docs/` stay git-tracked but out of the tarball; package-owned demo
+  bundles in `demos/` deliberately ship as runtime resources.
 
 ## Package conventions
 
@@ -53,8 +54,9 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
 - **Never add this repo to its own `.pi/settings.json`.** That file is for
   external catalog packages only; the local package is tested via `-e`.
 - **Before publishing:** `npm run typecheck`, `npm test`, `npm run lint:deps`,
-  then `npm run pack:check` to confirm the tarball contains only `extensions/`,
-  `skills/`, `README.md`, and `LICENSE` (no `docs/`, `test/`, or config files).
+  then `npm run pack:check` to confirm the tarball contains only `demos/`,
+  `extensions/`, `skills/`, `README.md`, and `LICENSE` (no `docs/`, `test/`, or
+  config files).
 - `lint:deps` is knip: it fails on unreachable files, unused exports, and
   undeclared/unused dependencies. Browser runtime assets and extension entry
   points are declared as `entry` in `knip.json` — add new ones there rather than

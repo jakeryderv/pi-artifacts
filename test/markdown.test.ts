@@ -74,12 +74,15 @@ test("markdown math preserves ambiguous currency text", () => {
 
 test("markdown math renders a standalone display block", () => {
   const html = renderMarkdownPage(
-    "Before\n\n$$\nx^2 + y^2\n$$\n\nAfter\n",
+    "Before\n\n$$\n\\frac{12}{14} \\times 100 \\approx 85.7\\%\n$$\n\nAfter\n",
     "Display",
   );
 
   assert.match(html, /class="katex-display"/);
-  assert.match(html, /annotation encoding="application\/x-tex">x\^2 \+ y\^2/);
+  assert.match(
+    html,
+    /annotation encoding="application\/x-tex">\\frac\{12\}\{14\} \\times 100 \\approx 85\.7\\%/,
+  );
   assert.doesNotMatch(html, /<p><span class="katex-display"/);
 });
 

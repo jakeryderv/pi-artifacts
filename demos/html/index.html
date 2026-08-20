@@ -1,0 +1,84 @@
+<header>
+  <p>
+    <svg class="pi-icon" aria-hidden="true">
+      <use href="/runtime/pi/icons.svg#trending-up"></use>
+    </svg>
+    Package demo
+  </p>
+  <h1>HTML Artifact Showcase</h1>
+  <p>
+    A content-only dashboard powered by semantic HTML, package-owned components,
+    and an artifact-local JSON snapshot—without authored JavaScript.
+  </p>
+</header>
+
+<pi-data-source name="showcase" src="assets/showcase.json"></pi-data-source>
+
+<main>
+  <section aria-labelledby="summary-heading">
+    <h2 id="summary-heading">Portfolio summary</h2>
+    <pi-grid columns="3">
+      <pi-metric
+        label="Revenue"
+        data-feed="showcase"
+        field="summary.revenue"
+        trend-field="summary.revenueTrend"
+      ></pi-metric>
+      <pi-metric
+        label="Artifacts"
+        data-feed="showcase"
+        field="summary.artifacts"
+        trend-field="summary.artifactTrend"
+      ></pi-metric>
+      <pi-metric
+        label="Validation pass rate"
+        data-feed="showcase"
+        field="summary.passRate"
+        trend-field="summary.passRateTrend"
+      ></pi-metric>
+    </pi-grid>
+  </section>
+
+  <section aria-labelledby="performance-heading">
+    <h2 id="performance-heading">Performance and workflow</h2>
+    <pi-grid columns="2">
+      <pi-card>
+        <h3>Quarterly output</h3>
+        <pi-chart data-feed="showcase" field="quarterlyChart"></pi-chart>
+      </pi-card>
+
+      <pi-card>
+        <h3>Artifact lifecycle</h3>
+        <pre class="mermaid">
+flowchart TD
+    A[Scaffold] --&gt; B[Author]
+    B --&gt; C{Validate}
+    C --&gt;|Pass| D[Preview]
+    C --&gt;|Revise| B
+    D --&gt; E[Export]
+        </pre>
+      </pi-card>
+    </pi-grid>
+  </section>
+
+  <section aria-labelledby="regions-heading">
+    <h2 id="regions-heading">Regional detail</h2>
+    <pi-table
+      data-feed="showcase"
+      field="regions"
+      columns="region,revenue,growth,status"
+    ></pi-table>
+  </section>
+
+  <section aria-labelledby="details-heading">
+    <h2 id="details-heading">Progressive disclosure</h2>
+    <details>
+      <summary>Why is this demo read-only?</summary>
+      <p>
+        It is served directly from the installed package under a dedicated demo
+        route. It never appears in the user artifact store, gallery scopes, or
+        cleanup commands.
+      </p>
+    </details>
+  </section>
+</main>

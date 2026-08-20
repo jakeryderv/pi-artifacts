@@ -27,6 +27,8 @@ The main package surfaces are:
   artifacts.
 - `test/` — Node test runner coverage for the extension internals and local
   preview server.
+- `demos/` — package-owned Markdown and HTML showcase bundles served read-only
+  by `/artifacts-demo`.
 - `docs/` — settled API, roadmap, security, and design documentation.
 - `docs/notes/` — exploratory or historical design notes.
 
@@ -75,8 +77,8 @@ used by the project.
 - Preserve the package's content-only artifact model and the security boundaries
   described in [`docs/security.md`](docs/security.md).
 - Keep the npm `files` list narrow. `npm run pack:check` should contain only
-  runtime resources, `README.md`, and `LICENSE` in addition to the automatic
-  package manifest.
+  runtime resources, package demos, `README.md`, and `LICENSE` in addition to
+  the automatic package manifest.
 
 More packaging rationale lives in
 [`docs/notes/packaging.md`](docs/notes/packaging.md).
@@ -84,6 +86,8 @@ More packaging rationale lives in
 ## Tests and documentation
 
 - Add focused regression coverage for behavior changes and bug fixes.
+- Keep one cleanly validating package demo for every registered artifact stack;
+  update demos when user-visible rendering capabilities change.
 - Update [`docs/api.md`](docs/api.md) when a tool, command, manifest, or runtime
   contract changes.
 - Update [`docs/security.md`](docs/security.md) when a trust boundary or

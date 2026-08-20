@@ -2,6 +2,7 @@ import { Type } from "typebox";
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
+import { getArtifactDemo } from "./demos.ts";
 import { writeArtifactExport } from "./export.ts";
 import {
   getArtifactRenderer,
@@ -84,6 +85,7 @@ export default function (pi: ExtensionAPI) {
   registerDeleteTool(pi, previewServer);
   registerDeleteManyTool(pi, previewServer);
   registerArtifactsCleanCommand(pi, previewServer);
+  registerArtifactsDemoCommand(pi, previewServer, viewerWindow);
   registerViewerCommand(pi, previewServer, viewerWindow);
   registerViewerModeCommand(pi);
   registerViewerAutoCommand(pi);
@@ -728,6 +730,46 @@ function registerViewerCommand(
   });
 }
 
+function registerArtifactsDemoCommand(
+  pi: ExtensionAPI,
+  previewServer: PreviewServerAccessor,
+  viewerWindow: ViewerWindowManager,
+): void {
+  pi.registerCommand("artifacts-demo", {
+    description:
+      "Open the package demo gallery, or a specific read-only markdown/html demo",
+    handler: async (args, ctx) => {
+      const requested = (args ?? "").trim().toLowerCase();
+      const demo = requested ? getArtifactDemo(requested) : undefined;
+      if (requested && !demo) {
+        ctx.ui.notify(
+          `Unknown artifact demo "${requested}". Use /artifacts-demo markdown or /artifacts-demo html.`,
+          "warning",
+        );
+        return;
+      }
+
+      const server = await previewServer.get();
+      const url = demo ? server.demoUrl(demo.id) : server.demosUrl;
+      if (!url) {
+        ctx.ui.notify("Artifact demos are unavailable.", "warning");
+        return;
+      }
+
+      const path = demo ? `/demos/${encodeURIComponent(demo.id)}/` : "/demos";
+      if (viewerWindow.isOpen() && server.hasViewerClients()) {
+        server.broadcastNavigate(path);
+        ctx.ui.notify(`Artifact demos focused: ${url}.`, "info");
+        return;
+      }
+
+      const preferred = await readViewerMode();
+      const window = await viewerWindow.open(url, preferred);
+      ctx.ui.notify(demoOpenMessage(window.mode, url), "info");
+    },
+  });
+}
+
 function registerViewerModeCommand(pi: ExtensionAPI): void {
   pi.registerCommand("viewer-mode", {
     description:
@@ -803,5 +845,16 @@ function viewerOpenMessage(mode: ViewerWindow["mode"], url: string): string {
       return `Artifact viewer opened in your browser: ${url}.`;
     default:
       return `Artifact viewer: ${url} (open this URL manually).`;
+  }
+}
+
+function demoOpenMessage(mode: ViewerWindow["mode"], url: string): string {
+  switch (mode) {
+    case "app":
+      return `Artifact demos opened in a dedicated window: ${url}.`;
+    case "browser":
+      return `Artifact demos opened in your browser: ${url}.`;
+    default:
+      return `Artifact demos: ${url} (open this URL manually).`;
   }
 }

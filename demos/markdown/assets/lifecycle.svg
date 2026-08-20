@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">Artifact lifecycle</title>
+  <desc id="desc">Four connected stages: scaffold, author, preview, and export.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" x2="1">
+      <stop offset="0" stop-color="#eef2ff" />
+      <stop offset="1" stop-color="#ecfeff" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="240" rx="24" fill="url(#background)" />
+  <g font-family="ui-sans-serif, system-ui, sans-serif" text-anchor="middle">
+    <g fill="#fff" stroke="#4f46e5" stroke-width="3">
+      <rect x="45" y="75" width="170" height="90" rx="16" />
+      <rect x="275" y="75" width="170" height="90" rx="16" />
+      <rect x="505" y="75" width="170" height="90" rx="16" />
+      <rect x="735" y="75" width="170" height="90" rx="16" />
+    </g>
+    <g fill="#312e81" font-size="24" font-weight="700">
+      <text x="130" y="129">Scaffold</text>
+      <text x="360" y="129">Author</text>
+      <text x="590" y="129">Preview</text>
+      <text x="820" y="129">Export</text>
+    </g>
+    <g stroke="#0891b2" stroke-width="5" stroke-linecap="round">
+      <path d="M225 120h38" />
+      <path d="M455 120h38" />
+      <path d="M685 120h38" />
+    </g>
+    <g fill="#0891b2">
+      <path d="m263 120-12-8v16z" />
+      <path d="m493 120-12-8v16z" />
+      <path d="m723 120-12-8v16z" />
+    </g>
+  </g>
+</svg>

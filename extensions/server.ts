@@ -9,6 +9,11 @@ import {
 } from "node:http";
 import { extname, resolve } from "node:path";
 
+import {
+  getArtifactDemo,
+  listArtifactDemos,
+  type ArtifactDemo,
+} from "./demos.ts";
 import { renderArtifactExport } from "./export.ts";
 import { isPathInside } from "./path-safety.ts";
 import { getArtifactRenderer } from "./renderer-registry.ts";
@@ -49,10 +54,12 @@ interface PreviewArtifactRecord {
 export interface PreviewServerState {
   url?: string;
   viewerUrl?: string;
+  demosUrl?: string;
   healthUrl?: string;
   registerArtifact: (record: PreviewArtifactRecord) => void;
   unregisterArtifact: (id: string) => void;
   artifactUrl: (id: string) => string | undefined;
+  demoUrl: (id: string) => string | undefined;
   /** Whether at least one gallery or artifact page has a live SSE connection. */
   hasViewerClients: () => boolean;
   /** Set the active session identity (key + cwd) for gallery scoping. */
@@ -134,6 +141,7 @@ export async function createPreviewServerState(
   return {
     url: baseUrl,
     viewerUrl: `${baseUrl}${basePath}/viewer`,
+    demosUrl: `${baseUrl}${basePath}/demos`,
     healthUrl: `${baseUrl}${basePath}/health`,
     registerArtifact(record) {
       artifacts.set(record.id, record);
@@ -143,6 +151,11 @@ export async function createPreviewServerState(
     },
     artifactUrl(id) {
       return `${baseUrl}${basePath}/artifacts/${encodeURIComponent(id)}/`;
+    },
+    demoUrl(id) {
+      return getArtifactDemo(id)
+        ? `${baseUrl}${basePath}/demos/${encodeURIComponent(id)}/`
+        : undefined;
     },
     hasViewerClients() {
       return sseClients.size > 0;
@@ -224,6 +237,11 @@ async function handleRequest(
     return;
   }
 
+  if (segments[0] === "demos") {
+    await handleDemoRequest(segments.slice(1), basePath, response);
+    return;
+  }
+
   if (segments[0] !== "artifacts" || !segments[1]) {
     sendText(response, 404, "Not found");
     return;
@@ -285,6 +303,35 @@ async function getPreviewArtifact(
   }
 
   return loadArtifact(id, root).catch(() => undefined);
+}
+
+async function handleDemoRequest(
+  segments: string[],
+  basePath: string,
+  response: ServerResponse,
+): Promise<void> {
+  if (segments.length === 0) {
+    sendDemoGallery(basePath, response);
+    return;
+  }
+
+  const demo = getArtifactDemo(segments[0] ?? "");
+  if (!demo) {
+    sendText(response, 404, "Demo does not exist.");
+    return;
+  }
+
+  const relativePath = segments.slice(1).join("/");
+  if (!relativePath) {
+    await sendRenderedArtifact(demo, basePath, response, "demo");
+    return;
+  }
+  if (relativePath === "export") {
+    await sendArtifactExport(demo, response);
+    return;
+  }
+
+  await sendArtifactFile(demo, relativePath, response);
 }
 
 /**
@@ -511,10 +558,61 @@ function viewerEmptyMessage(
   return `No artifacts found in ${escapeHtml(root)}.`;
 }
 
+function sendDemoGallery(basePath: string, response: ServerResponse): void {
+  const rows = listArtifactDemos()
+    .map((demo) => {
+      const href = `${basePath}/demos/${encodeURIComponent(demo.id)}/`;
+      return `<article>
+  <header><span class="pi-artifact-badge">${escapeHtml(demo.manifest.stack)}</span></header>
+  <h2><a href="${href}">${escapeHtml(demo.title)}</a></h2>
+  <p>${escapeHtml(demo.description)}</p>
+  <footer><a href="${href}">Open demo</a> · <a href="${href}export">Download standalone export</a></footer>
+</article>`;
+    })
+    .join("\n");
+
+  sendHtml(
+    response,
+    `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Artifacts Demos</title>
+<link rel="stylesheet" href="/runtime/pico/pico.classless.min.css">
+<style>
+body { max-width: 72rem; margin: 0 auto; padding: 2rem; }
+.demo-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.demo-grid article { margin: 0; }
+${artifactChromeStyles()}
+@media (max-width: 720px) { .demo-grid { grid-template-columns: 1fr; } .demo-toolbar { align-items: flex-start; flex-direction: column; } }
+</style>
+<script src="/runtime/pi/viewer-live.js" data-artifact-id="__package-demos__" data-viewer-base="${basePath}" defer></script>
+</head>
+<body>
+<nav class="demo-toolbar" aria-label="Demo navigation">
+  <a href="${basePath}/viewer">← Artifact gallery</a>
+  <strong>Package demos</strong>
+</nav>
+<header>
+  <h1>Pi Artifacts Demos</h1>
+  <p>Read-only showcases served from the installed package. These demos never enter the artifact store or its session and workspace scopes.</p>
+</header>
+<main class="demo-grid">
+${rows}
+</main>
+</body>
+</html>
+`,
+  );
+}
+
 async function sendRenderedArtifact(
-  artifact: PreviewArtifactRecord,
+  artifact: PreviewArtifactRecord | ArtifactDemo,
   basePath: string,
   response: ServerResponse,
+  kind: "artifact" | "demo" = "artifact",
 ): Promise<void> {
   const source = await readFile(artifact.entryPath, "utf8");
   const renderer = getArtifactRenderer(artifact.manifest.stack);
@@ -526,6 +624,8 @@ async function sendRenderedArtifact(
       stack: artifact.manifest.stack,
       lastRender: artifact.manifest.lastRender,
       basePath,
+      kind,
+      ...(kind === "demo" ? { liveReloadId: "__package-demos__" } : {}),
     }),
   );
 }

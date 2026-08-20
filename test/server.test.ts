@@ -56,6 +56,7 @@ test("preview server accessor closes a retry that races shutdown", async () => {
     registerArtifact() {},
     unregisterArtifact() {},
     artifactUrl: () => undefined,
+    demoUrl: () => undefined,
     hasViewerClients: () => false,
     setSessionContext() {},
     broadcastUpdate() {},

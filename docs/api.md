@@ -193,6 +193,19 @@ Structured result (`details`):
 
 ## Commands
 
+### `/artifacts-demo`
+
+Opens a read-only gallery containing one package-owned showcase for each
+registered artifact stack. Pass `markdown` or `html` to open that demo directly.
+The command follows the persisted `/viewer-mode` setting and reuses an active
+viewer window when possible.
+
+Demos are served from the installed package through a dedicated capability-
+protected `/demos` route. They reuse the normal renderers, runtime, CSP, toolbar,
+asset serving, and standalone export download, but never enter the artifact
+store. They are therefore absent from `/viewer`, list/delete tools, session and
+workspace scopes, and cleanup commands.
+
 ### `/viewer`
 
 Opens the live artifact gallery served by the localhost preview server. The
@@ -355,12 +368,13 @@ live reload script.
 
 Preview serving must:
 
-- start lazily on `/viewer` or the first successful render and close on session
-  shutdown,
+- start lazily on `/viewer`, `/artifacts-demo`, or the first successful render
+  and close on session shutdown,
 - bind only to localhost (`127.0.0.1`),
 - require a random per-server capability path for viewer pages, SSE, artifact
-  pages, and artifact assets,
-- serve only artifact bundle files and package runtime files,
+  pages and assets, and package demo pages and assets,
+- serve only artifact bundle files, package demo files, and package runtime
+  files,
 - reject path traversal,
 - reject executable JavaScript from artifact bundles,
 - avoid proxying external network requests by default,

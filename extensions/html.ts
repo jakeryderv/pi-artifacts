@@ -37,7 +37,10 @@ export function renderHtmlPage(
   }
 
   const escapedTitle = escapeHtml(title);
-  const artifactId = typeof artifact === "string" ? artifact : artifact?.id;
+  const artifactId =
+    typeof artifact === "string"
+      ? artifact
+      : (artifact?.liveReloadId ?? artifact?.id);
   const viewerBase =
     typeof artifact === "object" ? (artifact.basePath ?? "") : "";
   const toolbar =

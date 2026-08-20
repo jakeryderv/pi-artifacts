@@ -36,8 +36,8 @@ cannot escape the active bundle.
 
 ## Preview server
 
-The preview server starts only when `/viewer` or a successful render needs it.
-It closes during session shutdown and:
+The preview server starts only when `/viewer`, `/artifacts-demo`, or a successful
+render needs it. It closes during session shutdown and:
 
 - binds to `127.0.0.1` on an ephemeral port,
 - permits only `GET` and `HEAD`,
@@ -56,6 +56,12 @@ browser state, or process memory may be able to recover it.
 The stable `/runtime` namespace is intentionally outside the capability path.
 It serves only immutable package-owned static resources and never artifact or
 user data.
+
+Package demos are also immutable package-owned content, but remain behind the
+capability path under a dedicated `/demos` namespace. They are resolved from the
+installed package, never copied into the artifact store, and cannot collide with
+or shadow user artifact IDs. Demo asset serving uses the same real-path
+containment and executable-file restrictions as user bundles.
 
 ## Authored HTML and runtime JavaScript
 
