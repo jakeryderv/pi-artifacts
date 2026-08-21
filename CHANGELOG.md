@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add GitHub issue forms, a pull request template, Dependabot configuration,
+  and a custom social preview asset for a more complete project presence.
+- Add npm version, CI status, and license badges to the README.
+
+### Changed
+
+- Create GitHub Releases from curated changelog sections after successful npm
+  publishes.
+- Limit the regular CI workflow to branch and pull request events so release
+  tags do not run the same preflight twice.
+
 ## [0.10.0] - 2026-08-20
 
 ### Added

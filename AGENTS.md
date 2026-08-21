@@ -65,8 +65,9 @@ Full reasoning: [`docs/notes/packaging.md`](docs/notes/packaging.md).
 ## Publishing
 
 - **Releases are tag-triggered.** Bump `version`, commit, then push a `v<version>`
-  tag; `.github/workflows/release.yml` re-runs the full preflight and publishes.
-  Do not `npm publish` from a laptop — the workflow is the only trusted publisher.
+  tag; `.github/workflows/release.yml` re-runs the full preflight, publishes to
+  npm, and creates a GitHub Release from the matching changelog section. Do not
+  `npm publish` from a laptop — the workflow is the only trusted publisher.
 - Move notable `CHANGELOG.md` entries from `Unreleased` into the dated release
   before creating the release commit and tag.
 - Auth is npm **trusted publishing** (OIDC, `id-token: write`), so there is no

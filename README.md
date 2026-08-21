@@ -1,5 +1,9 @@
 # @jakeryderv/pi-artifacts
 
+[![npm version](https://img.shields.io/npm/v/%40jakeryderv%2Fpi-artifacts?logo=npm&color=cb3837)](https://www.npmjs.com/package/@jakeryderv/pi-artifacts)
+[![CI](https://github.com/jakeryderv/pi-artifacts/actions/workflows/ci.yml/badge.svg)](https://github.com/jakeryderv/pi-artifacts/actions/workflows/ci.yml)
+[![MIT license](https://img.shields.io/npm/l/%40jakeryderv%2Fpi-artifacts?color=2563eb)](LICENSE)
+
 Rich visualization artifacts for the [Pi coding agent](https://pi.dev/).
 Scaffold, validate, preview, manage, and export portable Markdown documents and
 declarative HTML dashboards from a Pi session.

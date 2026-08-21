@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">pi-artifacts social preview</title>
+  <desc id="desc">Rich Markdown reports and declarative HTML dashboards for the Pi coding agent.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08111f" />
+      <stop offset="0.52" stop-color="#101d36" />
+      <stop offset="1" stop-color="#172554" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8" />
+      <stop offset="1" stop-color="#818cf8" />
+    </linearGradient>
+    <linearGradient id="chart" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2563eb" />
+      <stop offset="1" stop-color="#67e8f9" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#dbeafe" stroke-opacity="0.045" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#020617" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#background)" />
+  <rect width="1280" height="640" fill="url(#grid)" />
+  <circle cx="1120" cy="42" r="270" fill="#2563eb" opacity="0.13" />
+  <circle cx="116" cy="624" r="250" fill="#06b6d4" opacity="0.09" />
+
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g transform="translate(72 68)">
+      <rect width="44" height="44" rx="13" fill="url(#accent)" />
+      <text x="22" y="31" fill="#08111f" font-size="29" font-weight="800" text-anchor="middle">π</text>
+      <text x="60" y="30" fill="#bae6fd" font-size="18" font-weight="700" letter-spacing="1.5">PI PACKAGE</text>
+    </g>
+
+    <text x="72" y="190" fill="#f8fafc" font-size="64" font-weight="760" letter-spacing="-2.2">pi-artifacts</text>
+    <text x="72" y="235" fill="#cbd5e1" font-size="24" font-weight="450">Rich visualization artifacts for the Pi coding agent</text>
+
+    <g transform="translate(72 282)" filter="url(#shadow)">
+      <rect width="530" height="258" rx="22" fill="#f8fafc" />
+      <rect width="530" height="44" rx="22" fill="#e2e8f0" />
+      <rect y="22" width="530" height="22" fill="#e2e8f0" />
+      <circle cx="24" cy="22" r="6" fill="#f87171" />
+      <circle cx="44" cy="22" r="6" fill="#fbbf24" />
+      <circle cx="64" cy="22" r="6" fill="#4ade80" />
+      <rect x="400" y="13" width="106" height="20" rx="10" fill="#dbeafe" />
+      <text x="453" y="28" fill="#2563eb" font-size="11" font-weight="700" text-anchor="middle">MARKDOWN</text>
+
+      <text x="28" y="83" fill="#0f172a" font-size="22" font-weight="750">Project snapshot</text>
+      <rect x="28" y="101" width="474" height="1" fill="#cbd5e1" />
+      <rect x="28" y="120" width="310" height="12" rx="6" fill="#cbd5e1" />
+      <rect x="28" y="144" width="446" height="9" rx="4.5" fill="#e2e8f0" />
+      <rect x="28" y="163" width="400" height="9" rx="4.5" fill="#e2e8f0" />
+      <rect x="28" y="191" width="14" height="14" rx="3" fill="#2563eb" />
+      <path d="m31.5 198 3.2 3.2 6-7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="52" y="194" width="170" height="9" rx="4.5" fill="#94a3b8" />
+      <rect x="28" y="219" width="14" height="14" rx="3" fill="#fff" stroke="#94a3b8" stroke-width="2" />
+      <rect x="52" y="222" width="208" height="9" rx="4.5" fill="#94a3b8" />
+    </g>
+
+    <g transform="translate(634 282)" filter="url(#shadow)">
+      <rect width="574" height="258" rx="22" fill="#f8fafc" />
+      <rect width="574" height="44" rx="22" fill="#e2e8f0" />
+      <rect y="22" width="574" height="22" fill="#e2e8f0" />
+      <circle cx="24" cy="22" r="6" fill="#f87171" />
+      <circle cx="44" cy="22" r="6" fill="#fbbf24" />
+      <circle cx="64" cy="22" r="6" fill="#4ade80" />
+      <rect x="464" y="13" width="86" height="20" rx="10" fill="#ede9fe" />
+      <text x="507" y="28" fill="#6d28d9" font-size="11" font-weight="700" text-anchor="middle">HTML</text>
+
+      <g transform="translate(24 66)">
+        <rect width="160" height="68" rx="12" fill="#eff6ff" stroke="#bfdbfe" />
+        <text x="14" y="24" fill="#64748b" font-size="11" font-weight="650">ARTIFACTS</text>
+        <text x="14" y="52" fill="#0f172a" font-size="26" font-weight="800">24</text>
+        <text x="79" y="51" fill="#16a34a" font-size="12" font-weight="700">+18%</text>
+      </g>
+      <g transform="translate(200 66)">
+        <rect width="160" height="68" rx="12" fill="#f5f3ff" stroke="#ddd6fe" />
+        <text x="14" y="24" fill="#64748b" font-size="11" font-weight="650">PASS RATE</text>
+        <text x="14" y="52" fill="#0f172a" font-size="26" font-weight="800">98%</text>
+      </g>
+      <g transform="translate(376 66)">
+        <rect width="174" height="68" rx="12" fill="#ecfeff" stroke="#a5f3fc" />
+        <text x="14" y="24" fill="#64748b" font-size="11" font-weight="650">EXPORTS</text>
+        <text x="14" y="52" fill="#0f172a" font-size="26" font-weight="800">12</text>
+        <text x="68" y="51" fill="#0891b2" font-size="12" font-weight="700">portable</text>
+      </g>
+
+      <g transform="translate(24 150)">
+        <rect width="334" height="84" rx="12" fill="#f8fafc" stroke="#cbd5e1" />
+        <line x1="18" y1="64" x2="316" y2="64" stroke="#cbd5e1" />
+        <rect x="34" y="42" width="38" height="22" rx="5" fill="url(#chart)" />
+        <rect x="98" y="27" width="38" height="37" rx="5" fill="url(#chart)" />
+        <rect x="162" y="12" width="38" height="52" rx="5" fill="url(#chart)" />
+        <rect x="226" y="22" width="38" height="42" rx="5" fill="url(#chart)" />
+        <rect x="290" y="5" width="22" height="59" rx="5" fill="url(#chart)" />
+      </g>
+      <g transform="translate(376 150)">
+        <rect width="174" height="84" rx="12" fill="#f8fafc" stroke="#cbd5e1" />
+        <rect x="12" y="11" width="54" height="22" rx="7" fill="#dbeafe" />
+        <rect x="108" y="11" width="54" height="22" rx="7" fill="#dcfce7" />
+        <path d="M66 22 H102" stroke="#60a5fa" stroke-width="2" />
+        <path d="m97 18 6 4-6 4" fill="none" stroke="#60a5fa" stroke-width="2" />
+        <rect x="60" y="51" width="54" height="22" rx="7" fill="#ede9fe" />
+        <path d="M39 33 V49 H60" fill="none" stroke="#818cf8" stroke-width="2" />
+        <path d="M135 33 V49 H114" fill="none" stroke="#818cf8" stroke-width="2" />
+      </g>
+    </g>
+
+    <g transform="translate(72 578)">
+      <rect width="642" height="38" rx="19" fill="#020617" fill-opacity="0.55" stroke="#334155" />
+      <text x="20" y="25" fill="#67e8f9" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">$</text>
+      <text x="42" y="25" fill="#e2e8f0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">pi install npm:@jakeryderv/pi-artifacts</text>
+    </g>
+    <text x="1208" y="603" fill="#94a3b8" font-size="16" font-weight="650" text-anchor="end">Markdown · HTML · Preview · Export</text>
+  </g>
+</svg>

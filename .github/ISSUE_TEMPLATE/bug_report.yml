@@ -1,0 +1,94 @@
+name: Bug report
+description: Report reproducible behavior that is not working as expected.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Do not include sensitive security details here; use [private vulnerability reporting](https://github.com/jakeryderv/pi-artifacts/security/advisories/new) instead.
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Run `pi list` or check the package entry in your Pi settings.
+      placeholder: 0.10.0
+    validations:
+      required: true
+
+  - type: input
+    id: pi-version
+    attributes:
+      label: Pi version
+      placeholder: 0.84.2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stack
+    attributes:
+      label: Artifact stack
+      options:
+        - Markdown
+        - HTML
+        - Viewer or storage
+        - Package demos
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include your operating system and relevant browser or terminal.
+      placeholder: Ubuntu 24.04, Chromium 128
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest artifact or sequence that consistently reproduces the problem.
+      placeholder: |
+        1. Scaffold an HTML artifact...
+        2. Add...
+        3. Render the artifact...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Relevant diagnostics
+      description: Paste sanitized logs, validation findings, or screenshots. Remove tokens, capability URLs, personal paths, and private artifact content.
+      render: shell
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I reproduced this with the latest published version.
+          required: true
+        - label: I searched existing issues for a duplicate.
+          required: true
+        - label: This report contains no sensitive security information.
+          required: true

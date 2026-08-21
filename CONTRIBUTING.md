@@ -122,5 +122,6 @@ Releases are maintainer-only and tag-triggered:
 5. Push the commit, then the tag.
 
 `.github/workflows/release.yml` verifies the tag/version match, repeats the full
-preflight, and publishes through npm trusted publishing with provenance. Do not
-run `npm publish` from a development machine.
+preflight, publishes through npm trusted publishing with provenance, and creates
+a GitHub Release from the matching changelog section. Do not run `npm publish`
+from a development machine.
