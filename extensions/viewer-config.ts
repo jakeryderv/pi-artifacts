@@ -1,9 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { CONFIG_DIR_NAME } from "@earendil-works/pi-coding-agent";
-
+import { artifactsRoot } from "./artifact-root.ts";
 import type { ViewerWindowMode } from "./viewer-launcher.ts";
 
 /**
@@ -29,7 +27,7 @@ interface ViewerConfig {
 const VALID_MODES: readonly ViewerModePreference[] = ["app", "browser", "none"];
 
 function viewerConfigPath(): string {
-  return join(homedir(), CONFIG_DIR_NAME, "artifacts", "config.json");
+  return join(artifactsRoot(), "config.json");
 }
 
 export function isViewerMode(value: unknown): value is ViewerModePreference {

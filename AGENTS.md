@@ -35,9 +35,16 @@ overhead. Future `@jakeryderv/pi-*` packages get their own repos.
 - **Extensions:** no background work (sockets/servers/watchers/timers) in the
   factory function. Start session-scoped resources in `session_start` (or lazily
   on first use); tear them down in an idempotent `session_shutdown`.
-- **Rebrand-safe paths:** derive `~/.pi/...` as
-  `join(os.homedir(), CONFIG_DIR_NAME, ...)`, never a hardcoded `.pi`.
-  `CONFIG_DIR_NAME` is exported from `@earendil-works/pi-coding-agent`.
+- **Rebrand-safe paths:** call `artifactsRoot()` from
+  `extensions/artifact-root.ts`; never hardcode `.pi`. That module is the only
+  one in the store path that imports `CONFIG_DIR_NAME` from
+  `@earendil-works/pi-coding-agent`, and it derives the path as
+  `join(os.homedir(), CONFIG_DIR_NAME, ...)`.
+- **The store takes an explicit root.** Every `extensions/store.ts` function
+  requires a `root`, so the module stays free of Pi imports and usable by
+  callers that serve artifacts from their own root. Resolving _which_ root is
+  the caller's job: extension entry points pass `artifactsRoot()`. Do not
+  reintroduce a Pi import or a default root into `store.ts`.
 - **No build step:** ship `.ts` source (jiti loads it). `tsconfig` is
   typecheck-only (`noEmit`).
 

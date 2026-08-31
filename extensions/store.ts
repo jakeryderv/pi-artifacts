@@ -9,49 +9,24 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
-import { homedir } from "node:os";
 import { join, resolve } from "node:path";
-
-import { CONFIG_DIR_NAME } from "@earendil-works/pi-coding-agent";
 
 import { createManifest, isArtifactManifest } from "./manifest.ts";
 import { isPathInside } from "./path-safety.ts";
-import { getArtifactRenderer } from "./renderer-registry.ts";
 import { isArtifactId, slugifyTitle, suffixSlug } from "./slug.ts";
+import { entryFileForStack } from "./stacks.ts";
 import type {
   ArtifactManifest,
   ArtifactStack,
   ScaffoldArtifactDetails,
 } from "./types.ts";
 
-/**
- * Root of the durable, cross-project artifact store.
- *
- * Derived from `CONFIG_DIR_NAME` rather than a hardcoded `.pi` so it stays
- * correct under rebranded Pi distributions. Defaults to `~/.pi/artifacts/`.
- */
-export function artifactsRoot(): string {
-  return join(homedir(), CONFIG_DIR_NAME, "artifacts");
-}
-
-function artifactPath(id: string, root = artifactsRoot()): string {
+function artifactPath(id: string, root: string): string {
   return join(root, id);
 }
 
-function manifestPath(id: string, root = artifactsRoot()): string {
+function manifestPath(id: string, root: string): string {
   return join(artifactPath(id, root), "manifest.json");
-}
-
-function entryFileNameForStack(stack: ArtifactStack): string {
-  return getArtifactRenderer(stack).entryFile;
-}
-
-function entryPath(
-  id: string,
-  stack: ArtifactStack,
-  root = artifactsRoot(),
-): string {
-  return join(artifactPath(id, root), entryFileNameForStack(stack));
 }
 
 function validateArtifactBundlePath(id: string, root: string): string {
@@ -67,10 +42,10 @@ function validateArtifactBundlePath(id: string, root: string): string {
 }
 
 export interface ScaffoldArtifactInput {
+  root: string;
   title: string;
   stack: ArtifactStack;
   cwd: string;
-  root?: string;
   now?: Date;
   sessionFile?: string;
   sessionKey?: string;
@@ -84,13 +59,13 @@ export async function scaffoldArtifact(
     throw new Error("Artifact title must not be empty.");
   }
 
-  const root = input.root ?? artifactsRoot();
+  const { root } = input;
   const baseSlug = slugifyTitle(title);
   await mkdir(root, { recursive: true });
 
   const id = await reserveArtifactId(root, baseSlug);
   const path = artifactPath(id, root);
-  const entryName = entryFileNameForStack(input.stack);
+  const entryName = entryFileForStack(input.stack);
   const entry = join(path, entryName);
   const assetsPath = join(path, "assets");
   const manifest = createManifest({
@@ -150,10 +125,15 @@ export interface LoadedArtifact {
   entryPath: string;
 }
 
-export async function loadArtifact(
-  id: string,
-  root = artifactsRoot(),
-): Promise<LoadedArtifact> {
+export interface ArtifactRef {
+  root: string;
+  id: string;
+}
+
+export async function loadArtifact({
+  root,
+  id,
+}: ArtifactRef): Promise<LoadedArtifact> {
   const path = validateArtifactBundlePath(id, root);
   const mPath = manifestPath(id, root);
   const rawManifest = await readFile(mPath, "utf8").catch((error: unknown) => {
@@ -225,9 +205,11 @@ export async function loadArtifact(
   };
 }
 
-export async function listArtifacts(
-  root = artifactsRoot(),
-): Promise<LoadedArtifact[]> {
+export async function listArtifacts({
+  root,
+}: {
+  root: string;
+}): Promise<LoadedArtifact[]> {
   const entries = await readdir(root, { withFileTypes: true }).catch(
     (error: unknown) => {
       if (isNodeError(error) && error.code === "ENOENT") {
@@ -241,7 +223,7 @@ export async function listArtifacts(
     entries
       .filter((entry) => entry.isDirectory())
       .map(async (entry) =>
-        loadArtifact(entry.name, root).catch(() => undefined),
+        loadArtifact({ root, id: entry.name }).catch(() => undefined),
       ),
   );
 
@@ -252,11 +234,11 @@ export async function listArtifacts(
     );
 }
 
-export async function writeManifest(
-  id: string,
-  manifest: ArtifactManifest,
-  root = artifactsRoot(),
-): Promise<void> {
+export async function writeManifest({
+  root,
+  id,
+  manifest,
+}: ArtifactRef & { manifest: ArtifactManifest }): Promise<void> {
   // Write-then-rename so a crash mid-write can never leave a truncated
   // manifest.json behind (the store is shared across concurrent sessions).
   validateArtifactBundlePath(id, root);
@@ -273,9 +255,9 @@ export async function writeManifest(
 }
 
 export interface DeleteArtifactsInput {
+  root: string;
   ids?: string[];
   olderThan?: Date;
-  root?: string;
 }
 
 /**
@@ -286,7 +268,7 @@ export interface DeleteArtifactsInput {
 export async function deleteArtifacts(
   input: DeleteArtifactsInput,
 ): Promise<string[]> {
-  const root = input.root ?? artifactsRoot();
+  const { root } = input;
   if (!input.ids && !input.olderThan) {
     throw new Error("deleteArtifacts requires ids or olderThan.");
   }
@@ -295,7 +277,7 @@ export async function deleteArtifacts(
 
   for (const id of input.ids ?? []) {
     try {
-      await deleteArtifact(id, root);
+      await deleteArtifact({ root, id });
       deleted.push(id);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -307,12 +289,12 @@ export async function deleteArtifacts(
 
   if (input.olderThan) {
     const cutoff = input.olderThan.toISOString();
-    for (const artifact of await listArtifacts(root)) {
+    for (const artifact of await listArtifacts({ root })) {
       if (
         artifact.manifest.updated < cutoff &&
         !deleted.includes(artifact.id)
       ) {
-        await deleteArtifact(artifact.id, root);
+        await deleteArtifact({ root, id: artifact.id });
         deleted.push(artifact.id);
       }
     }
@@ -321,10 +303,7 @@ export async function deleteArtifacts(
   return deleted;
 }
 
-export async function deleteArtifact(
-  id: string,
-  root = artifactsRoot(),
-): Promise<void> {
+export async function deleteArtifact({ root, id }: ArtifactRef): Promise<void> {
   const path = validateArtifactBundlePath(id, root);
 
   const stats = await stat(path).catch((error: unknown) => {

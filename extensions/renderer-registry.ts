@@ -1,5 +1,6 @@
 import { renderHtmlPage } from "./html.ts";
 import { renderMarkdownPage } from "./markdown.ts";
+import { ARTIFACT_ENTRY_FILES, isRegisteredArtifactStack } from "./stacks.ts";
 import type { ArtifactStack, RenderArtifactDetails } from "./types.ts";
 import { validateHtmlArtifact } from "./validation/html.ts";
 import { validateMarkdownArtifact } from "./validation/markdown.ts";
@@ -22,13 +23,13 @@ export interface ArtifactRenderer {
 const ARTIFACT_RENDERERS = Object.freeze({
   markdown: {
     stack: "markdown",
-    entryFile: "index.md",
+    entryFile: ARTIFACT_ENTRY_FILES.markdown,
     validate: validateMarkdownArtifact,
     render: renderMarkdownPage,
   },
   html: {
     stack: "html",
-    entryFile: "index.html",
+    entryFile: ARTIFACT_ENTRY_FILES.html,
     validate: validateHtmlArtifact,
     render: renderHtmlPage,
   },
@@ -39,10 +40,4 @@ export function getArtifactRenderer(stack: string): ArtifactRenderer {
     throw new Error(`Unsupported artifact stack: ${stack}`);
   }
   return ARTIFACT_RENDERERS[stack];
-}
-
-export function isRegisteredArtifactStack(
-  stack: string,
-): stack is ArtifactStack {
-  return Object.hasOwn(ARTIFACT_RENDERERS, stack);
 }

@@ -4,13 +4,11 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 import { getArtifactDemo } from "./demos.ts";
 import { writeArtifactExport } from "./export.ts";
-import {
-  getArtifactRenderer,
-  isRegisteredArtifactStack,
-} from "./renderer-registry.ts";
+import { getArtifactRenderer } from "./renderer-registry.ts";
+import { isRegisteredArtifactStack } from "./stacks.ts";
 import { createPreviewServerState, type PreviewServerState } from "./server.ts";
+import { artifactsRoot } from "./artifact-root.ts";
 import {
-  artifactsRoot,
   deleteArtifact,
   deleteArtifacts,
   listArtifacts,
@@ -233,6 +231,7 @@ async function executeScaffoldArtifact(
 
   const sessionFile = getSessionFile(ctx);
   const details = await scaffoldArtifact({
+    root: artifactsRoot(),
     title: input.title,
     stack: input.type,
     cwd: (ctx as ContextWithCwd).cwd ?? process.cwd(),
@@ -313,7 +312,10 @@ async function executeRenderArtifact(
   viewerWindow: ViewerWindowManager,
 ) {
   try {
-    const artifact = await loadArtifact(input.id);
+    const artifact = await loadArtifact({
+      root: artifactsRoot(),
+      id: input.id,
+    });
     const validation = await getArtifactRenderer(
       artifact.manifest.stack,
     ).validate(artifact.entryPath);
@@ -330,7 +332,11 @@ async function executeRenderArtifact(
       updated: rendered,
       lastRender: renderStatus,
     };
-    await writeManifest(artifact.id, updatedManifest);
+    await writeManifest({
+      root: artifactsRoot(),
+      id: artifact.id,
+      manifest: updatedManifest,
+    });
 
     if (validation.errors.length > 0) {
       previewServer.peek()?.broadcastUpdate(artifact.id);
@@ -439,7 +445,10 @@ function registerExportTool(pi: ExtensionAPI): void {
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
       const input = params as ExportArtifactParams;
       try {
-        const artifact = await loadArtifact(input.id);
+        const artifact = await loadArtifact({
+          root: artifactsRoot(),
+          id: input.id,
+        });
         const exported = await writeArtifactExport(artifact);
         return {
           content: [
@@ -502,7 +511,7 @@ function registerListTool(pi: ExtensionAPI): void {
         ? requested
         : "all";
       const artifacts = filterByScope(
-        await listArtifacts(),
+        await listArtifacts({ root: artifactsRoot() }),
         scope,
         scopeContextFrom(ctx),
       );
@@ -548,7 +557,7 @@ function registerDeleteTool(
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
       const input = params as DeleteArtifactParams;
       try {
-        await deleteArtifact(input.id);
+        await deleteArtifact({ root: artifactsRoot(), id: input.id });
         const server = previewServer.peek();
         server?.unregisterArtifact(input.id);
         server?.broadcastUpdate();
@@ -619,6 +628,7 @@ function registerDeleteManyTool(
       }
 
       const deleted = await deleteArtifacts({
+        root: artifactsRoot(),
         ids: input.ids,
         olderThan:
           input.older_than_days === undefined
@@ -653,7 +663,7 @@ function registerArtifactsCleanCommand(
       const requested = (args ?? "").trim();
 
       if (!requested) {
-        const count = (await listArtifacts()).length;
+        const count = (await listArtifacts({ root: artifactsRoot() })).length;
         ctx.ui.notify(
           `${count} artifact(s) in ${artifactsRoot()}. Delete stale ones with /artifacts-clean <days>.`,
           "info",
@@ -671,6 +681,7 @@ function registerArtifactsCleanCommand(
       }
 
       const deleted = await deleteArtifacts({
+        root: artifactsRoot(),
         olderThan: new Date(Date.now() - days * 86_400_000),
       });
       unregisterDeleted(previewServer, deleted);

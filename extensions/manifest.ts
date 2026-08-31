@@ -1,4 +1,4 @@
-import { isRegisteredArtifactStack } from "./renderer-registry.ts";
+import { isRegisteredArtifactStack } from "./stacks.ts";
 import type {
   ArtifactManifest,
   ArtifactRenderStatus,

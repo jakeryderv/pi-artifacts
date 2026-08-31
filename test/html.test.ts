@@ -204,7 +204,7 @@ test("preview server renders registered html artifacts with CSP", async (t) => {
     '{"total":42}',
   );
 
-  const artifact = await loadArtifact(scaffolded.id, root);
+  const artifact = await loadArtifact({ root: root, id: scaffolded.id });
   const server = await createPreviewServerState(root);
   t.after(() => server.close());
   server.registerArtifact({

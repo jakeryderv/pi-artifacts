@@ -14,6 +14,7 @@ import {
   listArtifactDemos,
   type ArtifactDemo,
 } from "./demos.ts";
+import { artifactsRoot } from "./artifact-root.ts";
 import { renderArtifactExport } from "./export.ts";
 import { isPathInside } from "./path-safety.ts";
 import { getArtifactRenderer } from "./renderer-registry.ts";
@@ -24,7 +25,7 @@ import {
   isArtifactScope,
   type ScopeContext,
 } from "./scope.ts";
-import { artifactsRoot, listArtifacts, loadArtifact } from "./store.ts";
+import { listArtifacts, loadArtifact } from "./store.ts";
 import type { ArtifactManifest } from "./types.ts";
 import {
   artifactChromeStyles,
@@ -302,7 +303,7 @@ async function getPreviewArtifact(
     return registered;
   }
 
-  return loadArtifact(id, root).catch(() => undefined);
+  return loadArtifact({ root, id }).catch(() => undefined);
 }
 
 async function handleDemoRequest(
@@ -394,7 +395,7 @@ async function sendViewer(
   const query = (params.get("q") ?? "").trim().toLowerCase();
   const stackFilter = params.get("stack") ?? "";
   const statusFilter = params.get("status") ?? "";
-  const all = await listArtifacts(root);
+  const all = await listArtifacts({ root });
   const scoped = filterByScope(all, scope, sessionContext);
   const artifacts = scoped.filter((artifact) => {
     const manifest = artifact.manifest;
