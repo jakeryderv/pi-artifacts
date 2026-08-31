@@ -168,7 +168,7 @@ test("listArtifacts returns valid bundles sorted by updated timestamp", async (t
   });
   await mkdir(join(root, "not-an-artifact"));
 
-  const artifacts = await listArtifacts(root);
+  const artifacts = await listArtifacts({ root: root });
 
   assert.deepEqual(
     artifacts.map((artifact) => artifact.id),
@@ -185,15 +185,15 @@ test("deleteArtifact removes a bundle and rejects traversal ids", async (t) => {
     root,
   });
 
-  await deleteArtifact(scaffolded.id, root);
-  assert.equal((await listArtifacts(root)).length, 0);
+  await deleteArtifact({ root: root, id: scaffolded.id });
+  assert.equal((await listArtifacts({ root: root })).length, 0);
 
   await assert.rejects(
-    () => deleteArtifact(scaffolded.id, root),
+    () => deleteArtifact({ root: root, id: scaffolded.id }),
     /does not exist/,
   );
   await assert.rejects(
-    () => deleteArtifact("../escape", root),
+    () => deleteArtifact({ root: root, id: "../escape" }),
     /Invalid artifact id/,
   );
   const nested = await scaffoldArtifact({
@@ -203,7 +203,7 @@ test("deleteArtifact removes a bundle and rejects traversal ids", async (t) => {
     root,
   });
   await assert.rejects(
-    () => deleteArtifact(`${nested.id}/assets`, root),
+    () => deleteArtifact({ root: root, id: `${nested.id}/assets` }),
     /Invalid artifact id/,
   );
   assert.equal((await stat(join(nested.path, "assets"))).isDirectory(), true);
@@ -217,21 +217,21 @@ test("loadArtifact rejects traversal ids and manifest entry traversal", async (t
     cwd: "/project",
     root,
   });
-  const loaded = await loadArtifact(scaffolded.id, root);
+  const loaded = await loadArtifact({ root: root, id: scaffolded.id });
 
   await assert.rejects(
-    () => loadArtifact("../escape", root),
+    () => loadArtifact({ root: root, id: "../escape" }),
     /Invalid artifact id/,
   );
 
-  await writeManifest(
-    scaffolded.id,
-    { ...loaded.manifest, entry: "../secret.md" },
-    root,
-  );
+  await writeManifest({
+    root: root,
+    id: scaffolded.id,
+    manifest: { ...loaded.manifest, entry: "../secret.md" },
+  });
 
   await assert.rejects(
-    () => loadArtifact(scaffolded.id, root),
+    () => loadArtifact({ root: root, id: scaffolded.id }),
     /entry path escapes/,
   );
 });
@@ -250,7 +250,7 @@ test("loadArtifact rejects entry symlinks that escape the bundle", async (t) => 
   await symlink(outsideEntry, scaffolded.entry);
 
   await assert.rejects(
-    () => loadArtifact(scaffolded.id, root),
+    () => loadArtifact({ root: root, id: scaffolded.id }),
     /entry path escapes/,
   );
 });
@@ -267,7 +267,7 @@ test("loadArtifact rejects bundle symlinks that escape the store", async (t) => 
   await symlink(outside.path, join(root, outside.id), "dir");
 
   await assert.rejects(
-    () => loadArtifact(outside.id, root),
+    () => loadArtifact({ root: root, id: outside.id }),
     /entry path escapes/,
   );
 });
@@ -288,7 +288,7 @@ test("scaffoldArtifact creates html bundles with an index.html entry", async (t)
   assert.equal(manifest.stack, "html");
   assert.equal(manifest.entry, "index.html");
 
-  const listed = await listArtifacts(root);
+  const listed = await listArtifacts({ root: root });
   assert.deepEqual(
     listed.map((artifact) => artifact.id),
     [scaffolded.id],
@@ -304,8 +304,8 @@ test("deleteArtifact removes an html bundle", async (t) => {
     root,
   });
 
-  await deleteArtifact(scaffolded.id, root);
-  assert.equal((await listArtifacts(root)).length, 0);
+  await deleteArtifact({ root: root, id: scaffolded.id });
+  assert.equal((await listArtifacts({ root: root })).length, 0);
 });
 
 test("writeManifest replaces the manifest atomically with no temp litter", async (t) => {
@@ -316,17 +316,17 @@ test("writeManifest replaces the manifest atomically with no temp litter", async
     cwd: "/project",
     root,
   });
-  const artifact = await loadArtifact(scaffolded.id, root);
+  const artifact = await loadArtifact({ root: root, id: scaffolded.id });
 
-  await writeManifest(
-    scaffolded.id,
-    { ...artifact.manifest, title: "Updated Title" },
-    root,
-  );
+  await writeManifest({
+    root: root,
+    id: scaffolded.id,
+    manifest: { ...artifact.manifest, title: "Updated Title" },
+  });
 
   const files = await readdir(artifact.path);
   assert.deepEqual(files.sort(), ["assets", "index.md", "manifest.json"]);
-  const reloaded = await loadArtifact(scaffolded.id, root);
+  const reloaded = await loadArtifact({ root: root, id: scaffolded.id });
   assert.equal(reloaded.manifest.title, "Updated Title");
 });
 
@@ -338,24 +338,24 @@ test("concurrent manifest writes use independent atomic temp files", async (t) =
     cwd: "/project",
     root,
   });
-  const artifact = await loadArtifact(scaffolded.id, root);
+  const artifact = await loadArtifact({ root: root, id: scaffolded.id });
 
   await Promise.all([
-    writeManifest(
-      scaffolded.id,
-      { ...artifact.manifest, title: "Writer One" },
-      root,
-    ),
-    writeManifest(
-      scaffolded.id,
-      { ...artifact.manifest, title: "Writer Two" },
-      root,
-    ),
+    writeManifest({
+      root: root,
+      id: scaffolded.id,
+      manifest: { ...artifact.manifest, title: "Writer One" },
+    }),
+    writeManifest({
+      root: root,
+      id: scaffolded.id,
+      manifest: { ...artifact.manifest, title: "Writer Two" },
+    }),
   ]);
 
   const files = await readdir(artifact.path);
   assert.deepEqual(files.sort(), ["assets", "index.md", "manifest.json"]);
-  const reloaded = await loadArtifact(scaffolded.id, root);
+  const reloaded = await loadArtifact({ root: root, id: scaffolded.id });
   assert.ok(["Writer One", "Writer Two"].includes(reloaded.manifest.title));
 });
 
@@ -383,7 +383,7 @@ test("deleteArtifacts deletes by age using manifest.updated", async (t) => {
 
   assert.deepEqual(deleted, [stale.id]);
   assert.deepEqual(
-    (await listArtifacts(root)).map((artifact) => artifact.id),
+    (await listArtifacts({ root: root })).map((artifact) => artifact.id),
     [fresh.id],
   );
 });
@@ -410,7 +410,7 @@ test("deleteArtifacts deletes by id list, skipping missing and invalid ids", asy
 
   assert.deepEqual(deleted, [drop.id]);
   assert.deepEqual(
-    (await listArtifacts(root)).map((artifact) => artifact.id),
+    (await listArtifacts({ root: root })).map((artifact) => artifact.id),
     [keep.id],
   );
 });

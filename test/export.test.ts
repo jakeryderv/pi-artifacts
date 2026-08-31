@@ -28,7 +28,7 @@ test("markdown export inlines runtime CSS, fonts, and bundle assets", async (t) 
   );
 
   const html = await renderArtifactExport(
-    await loadArtifact(scaffolded.id, root),
+    await loadArtifact({ root: root, id: scaffolded.id }),
   );
 
   assert.match(html, /http-equiv="Content-Security-Policy"/);
@@ -63,7 +63,7 @@ test("html export embeds component feeds, scripts, and the icon sprite", async (
   );
 
   const html = await renderArtifactExport(
-    await loadArtifact(scaffolded.id, root),
+    await loadArtifact({ root: root, id: scaffolded.id }),
   );
 
   assert.match(html, /data-pi-export-json="{&quot;total&quot;:42}"/);
@@ -96,7 +96,7 @@ test("full-document export adds the safety CSP and removes authored execution", 
   );
 
   const html = await renderArtifactExport(
-    await loadArtifact(scaffolded.id, root),
+    await loadArtifact({ root: root, id: scaffolded.id }),
   );
 
   assert.match(html, /script-src 'nonce-[^']+'/);
@@ -123,7 +123,7 @@ test("export attribute cleanup does not alter displayed code", async (t) => {
   );
 
   const html = await renderArtifactExport(
-    await loadArtifact(scaffolded.id, root),
+    await loadArtifact({ root: root, id: scaffolded.id }),
   );
 
   assert.match(
@@ -141,7 +141,7 @@ test("writeArtifactExport uses a stable path inside the bundle", async (t) => {
     root,
   });
   await writeFile(scaffolded.entry, "# Written\n");
-  const artifact = await loadArtifact(scaffolded.id, root);
+  const artifact = await loadArtifact({ root: root, id: scaffolded.id });
 
   const first = await writeArtifactExport(artifact);
   const second = await writeArtifactExport(artifact);

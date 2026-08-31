@@ -137,11 +137,12 @@ test("viewer filters by query, stack, and render status", async (t) => {
     cwd: "/project-b",
     root,
   });
-  const okArtifact = await loadArtifact(ok.id, root);
-  const warnedArtifact = await loadArtifact(warned.id, root);
-  await writeManifest(
-    ok.id,
-    {
+  const okArtifact = await loadArtifact({ root: root, id: ok.id });
+  const warnedArtifact = await loadArtifact({ root: root, id: warned.id });
+  await writeManifest({
+    root: root,
+    id: ok.id,
+    manifest: {
       ...okArtifact.manifest,
       lastRender: {
         ok: true,
@@ -150,11 +151,11 @@ test("viewer filters by query, stack, and render status", async (t) => {
         rendered: "2026-06-25T00:00:00.000Z",
       },
     },
-    root,
-  );
-  await writeManifest(
-    warned.id,
-    {
+  });
+  await writeManifest({
+    root: root,
+    id: warned.id,
+    manifest: {
       ...warnedArtifact.manifest,
       lastRender: {
         ok: true,
@@ -163,8 +164,7 @@ test("viewer filters by query, stack, and render status", async (t) => {
         rendered: "2026-06-25T00:00:00.000Z",
       },
     },
-    root,
-  );
+  });
 
   const server = await createPreviewServerState(root);
   t.after(() => server.close());
@@ -367,7 +367,7 @@ test("preview server renders registered markdown artifacts with CSP", async (t) 
   await mkdir(join(scaffolded.path, "assets"), { recursive: true });
   await writeFile(join(scaffolded.path, "assets", "chart.svg"), "<svg></svg>");
 
-  const artifact = await loadArtifact(scaffolded.id, root);
+  const artifact = await loadArtifact({ root: root, id: scaffolded.id });
   const server = await createPreviewServerState(root);
   t.after(() => server.close());
   server.registerArtifact({
