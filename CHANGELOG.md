@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-31
+
 ### Added
 
 - Add GitHub issue forms, a pull request template, Dependabot configuration,
@@ -19,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   publishes.
 - Limit the regular CI workflow to branch and pull request events so release
   tags do not run the same preflight twice.
+- Decouple the artifact store from Pi and from the renderers. Every
+  `extensions/store.ts` function now takes an explicit `root`; `artifactsRoot()`
+  moved to `extensions/artifact-root.ts`, and the artifact stack table moved to
+  `extensions/stacks.ts`. Reading or listing a bundle no longer loads
+  `@earendil-works/pi-coding-agent`, prettier, KaTeX or markdownlint.
 - Stop autolinking bare domains in rendered Markdown. markdown-it 15 disables
   linkify-it's fuzzy matching by default, so text such as `example.com` now
   renders literally instead of becoming a link. Explicit `[text](url)` links,
@@ -179,7 +186,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   delete tools; durable bundles; a localhost preview server; `/viewer`; and the
   artifact-authoring skill.
 
-[Unreleased]: https://github.com/jakeryderv/pi-artifacts/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/jakeryderv/pi-artifacts/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/jakeryderv/pi-artifacts/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/jakeryderv/pi-artifacts/compare/v0.9.2...v0.10.0
 [0.9.2]: https://github.com/jakeryderv/pi-artifacts/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/jakeryderv/pi-artifacts/compare/pi-artifacts-v0.9.0...v0.9.1
