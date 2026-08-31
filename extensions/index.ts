@@ -4,10 +4,8 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 import { getArtifactDemo } from "./demos.ts";
 import { writeArtifactExport } from "./export.ts";
-import {
-  getArtifactRenderer,
-  isRegisteredArtifactStack,
-} from "./renderer-registry.ts";
+import { getArtifactRenderer } from "./renderer-registry.ts";
+import { isRegisteredArtifactStack } from "./stacks.ts";
 import { createPreviewServerState, type PreviewServerState } from "./server.ts";
 import { artifactsRoot } from "./artifact-root.ts";
 import {

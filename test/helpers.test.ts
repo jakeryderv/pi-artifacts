@@ -4,10 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import {
-  getArtifactRenderer,
-  isRegisteredArtifactStack,
-} from "../extensions/renderer-registry.ts";
+import { getArtifactRenderer } from "../extensions/renderer-registry.ts";
+import { isRegisteredArtifactStack } from "../extensions/stacks.ts";
 import { isArtifactId, slugifyTitle, suffixSlug } from "../extensions/slug.ts";
 import {
   isViewerMode,

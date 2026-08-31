@@ -13,8 +13,8 @@ import { join, resolve } from "node:path";
 
 import { createManifest, isArtifactManifest } from "./manifest.ts";
 import { isPathInside } from "./path-safety.ts";
-import { getArtifactRenderer } from "./renderer-registry.ts";
 import { isArtifactId, slugifyTitle, suffixSlug } from "./slug.ts";
+import { entryFileForStack } from "./stacks.ts";
 import type {
   ArtifactManifest,
   ArtifactStack,
@@ -27,10 +27,6 @@ function artifactPath(id: string, root: string): string {
 
 function manifestPath(id: string, root: string): string {
   return join(artifactPath(id, root), "manifest.json");
-}
-
-function entryFileNameForStack(stack: ArtifactStack): string {
-  return getArtifactRenderer(stack).entryFile;
 }
 
 function validateArtifactBundlePath(id: string, root: string): string {
@@ -69,7 +65,7 @@ export async function scaffoldArtifact(
 
   const id = await reserveArtifactId(root, baseSlug);
   const path = artifactPath(id, root);
-  const entryName = entryFileNameForStack(input.stack);
+  const entryName = entryFileForStack(input.stack);
   const entry = join(path, entryName);
   const assetsPath = join(path, "assets");
   const manifest = createManifest({
