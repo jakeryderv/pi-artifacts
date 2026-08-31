@@ -56,7 +56,6 @@ async function lintMarkdown(
       default: true,
       MD013: false,
     },
-    resultVersion: 3,
   });
 
   return (results[entryPath] ?? []).map((error) => ({
