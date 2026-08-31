@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   publishes.
 - Limit the regular CI workflow to branch and pull request events so release
   tags do not run the same preflight twice.
+- Stop autolinking bare domains in rendered Markdown. markdown-it 15 disables
+  linkify-it's fuzzy matching by default, so text such as `example.com` now
+  renders literally instead of becoming a link. Explicit `[text](url)` links,
+  `<https://autolinks>`, and e-mail addresses are unaffected, and URLs adjacent
+  to CJK text no longer swallow the following characters.
 
 ## [0.10.0] - 2026-08-20
 
