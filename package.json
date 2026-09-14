@@ -67,7 +67,7 @@
     "prettier": "^3.8.4"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "^0.84.2",
+    "@earendil-works/pi-coding-agent": "^0.85.1",
     "@types/node": "^24.13.3",
     "knip": "^6.29.0",
     "markdownlint-cli2": "^0.23.2",
